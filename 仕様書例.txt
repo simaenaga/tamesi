@@ -1,0 +1,93 @@
+シーンごとに作成する
+
+変数
+
+・State:イベントステータス
+Nomalモード、GameEventモード
+・eventKind:イベントの種類分岐用
+自分で定義
+・talkProgress:話し中の進捗度
+腹が減った　->　飯ちょうだい
+0　->　1
+のように使う
+・itemList:拾ったアイテムリスト
+0:未取得　1:取得済み
+配列の大きさはアイテムの種類数
+・eventMap:イベントの発生する場所と種類を定義
+eventMap[0][0]=1; -> マップの[0][0]番目にイベント1発生
+イベントの種類は自分で定義
+
+メソッド
+
+・makeMessage(text)
+textの内容が表示されるメッセージウィンドウを返却する
+・touchJudge(x,y)
+タッチした座標(x,y)がパッド領域でなければtrue、そうでなければfalseを返す
+・playerToMapX(px)
+プレイヤー座標pxをマップの配列xに対応させる数値を返却
+・playerToMapY(py)
+略
+・isSurroundEvent(x,y,direction,array,event)]
+プレイヤーのいる座標(x,y)の向いている方向に、eventがあれば、true、そうでなければfalseを返す
+arrayは判定用配列
+
+必要な画像はpreloadで読み込んでおく
+
+仕様書の書き方はルートシーン仕様書を参考
+
+分からないところは以下を確認すること
+=============================================================
+
+作成手順
+
+1. game.makeScene1をコピー＆ペースト
+2. array1配列にマップの最背面となるマップ画像を入れる
+3. array2配列にマップの上書きする画像を入れる（ベッド、宝箱など）
+4. array3配列に衝突判定を定義
+5. eventMap配列にイベント判定を定義(マップ上のイベントの場所を記憶しておく配列)
+6. グループ化するとき、配置したキャラなどもstageのグループにする
+7. タッチしたときの処理をaddEventListenerに記述
+
+イベント処理に関して
+
+・if(touchJudge(e.x,e.y)){} の中に記述していく (パッド以外をタッチしたときにイベント実行)
+・State変数でイベント分岐(Nomal:普通の状態　GameEvent:イベント発生状態)
+
+　Nomal状態
+
+・Nomal状態中、プレイヤーの向いている方向にイベントがあるなら実行
+isSurroundEvent(playerToMapX(player.x),playerToMapY(player.y),player.direction,eventMap,420)
+playerToMapX(player.x): プレイヤーのいるX座標
+playerToMapY(player.y): プレイヤーのいるY座標
+player.direction: プレイヤーの向いている方向
+eventMap:向いている方向にアイテムがあるかどうか判定用の配列
+420:任意のイベント（自分で勝手に定義してよい eventMapの中で、プレイヤーのいる周囲に420というイベントがあるかの判定用）
+・messageにメッセージウィンドウを代入
+・メッセージウィンドウはmakeMessageメソッドで作る(カッコ内で、作りたい文字列記入)
+・eventKindで、イベントの種類分け(StateがGameEvent状態のときの分岐用)
+・StateをGameEventに必ず変更
+・イベントの種類がシーン遷移だった場合、プレイヤーのいる位置がシーン遷移する場所でタッチしたらシーン遷移実行
+
+　GameEvent状態
+・eventKindでイベントの種類分岐(種類は数字で定義)
+　　アイテムイベントの場合
+・メッセージを削除
+・マップ中の上書きした画像array2を-1に(削除)
+・マップ中の衝突判定を0に(削除)
+・マップ中のイベント判定を-1に(削除)
+・拾ったアイテムと分かるように1に(itemListを1に)
+・マップを再ロード
+・StateをNomalに
+　　トークイベントの場合
+・talkProgressでトーク進捗度を管理
+・メッセージを削除してもう一度生成
+・トーク進捗を更新(talkProgress++)
+・トークの最後まで行くと、eventKindを0に
+・トーク進捗を0に(talkProgress=0)
+・StateをNomalに
+
+　注意点
+・イベント判定は必ずeventMap配列を使うこと
+・eventKindでイベント分岐
+・トークイベントはtalkProgressで進捗管理
+・イベント終了時には必ずeventKindを0に、talkProgressを0に、StateをNomalに、メッセージを削除
