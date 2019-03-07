@@ -4,7 +4,7 @@ var State=0;//ゲームプレイ中のステータス
 const Nomal=0;
 const GameEvent=1;
 
-var message=makeMessage("日本語1");//メッセージ出力用
+var message;//メッセージ出力用
 var eventKind=0;//イベントの種類
 var talkProgress=0;//話し中の進捗度
 var mapScale=320;//マップの大きさ
@@ -21,7 +21,7 @@ window.onload = function() {
 
     var game = new Game(mapScale, mapScale);
     game.fps = 15;
-    game.preload('map1.gif', 'chara0.gif','heya_girl.png','door.mp3','Knock.mp3');
+    game.preload('map1.gif', 'chara0.gif','heya_girl.png','door.mp3','Knock.mp3','deep.mp3');
     game.onload=function(){
         var map = new Map(mapTileScale, mapTileScale);
         map.image = game.assets['map1.gif'];
@@ -57,6 +57,7 @@ window.onload = function() {
         map.image = game.assets['heya_girl.png'];
         var doorSound = game.assets['door.mp3'].clone();
         var knockSound = game.assets['Knock.mp3'].clone();
+        var futureSound = game.assets['deep.mp3'].clone();
 
         var eventMap=new Array(mapArraySize);//イベント判定用
         for(var i=0;i<mapArraySize;i++){
@@ -176,14 +177,14 @@ window.onload = function() {
         array0[3][11]=14*16+10;
 
         //本棚
-        array0[3][7]=16*33;
-        array0[3][8]=16*33+1;
-        array0[4][7]=16*34;
-        array0[4][8]=16*34+1;
-        array0[5][7]=16*35;
-        array0[5][8]=16*35+1;
-        array0[6][7]=16*36;
-        array0[6][8]=16*36+1;
+        array0[4][7]=16*33;
+        array0[4][8]=16*33+1;
+        array0[5][7]=16*34;
+        array0[5][8]=16*34+1;
+        array0[6][7]=16*35;
+        array0[6][8]=16*35+1;
+        array0[7][7]=16*36;
+        array0[7][8]=16*36+1;
 
         //マット
         array0[10][16]=16*64+14;
@@ -202,6 +203,21 @@ window.onload = function() {
                 array3[i][j]=0;
             }
         }
+        
+        for(var i=0;i<10;i++){
+            array3[6+i][6]=1;
+            array3[6+i][17]=1;
+            array3[6][7+i]=1;
+            array3[15][7+i]=1;
+        }
+        array3[7][7]=1;
+        array3[7][8]=1;
+        array3[11][7]=1;
+        array3[11][8]=1;
+        array3[13][7]=1;
+        array3[13][8]=1;
+        array3[14][7]=1;
+        array3[14][8]=1;
         map.collisionData=array3;
 
         var foregroundMap = new Map(16, 16);
@@ -373,6 +389,11 @@ window.onload = function() {
                     talkProgress++;
                     doorSound.stop();
                 }
+            }else if(eventKind==1 && talkProgress == 9){
+                scene.removeChild(message);
+                message=makeMessage("ミラ「な、なんであかないのーっ！？」");
+                scene.addChild(message);
+                talkProgress++;
             }else if(eventKind==1 && talkProgress == 13){
                 player.tick++;
                 if(player.tick==48){
@@ -380,6 +401,11 @@ window.onload = function() {
                     talkProgress++;
                     knockSound.stop();
                 }
+            }else if(eventKind==1 && talkProgress == 14){
+                scene.removeChild(message);
+                message=makeMessage("ミラ「だめだー、ぜんぜん気づいてくれないよう。うう、わたしのみかんゼリー・・・・」");
+                scene.addChild(message);
+                talkProgress++;
             }
 
             
@@ -457,6 +483,7 @@ window.onload = function() {
                                         break;
 
                                     case 7:
+                                        scene.removeChild(message);
                                         doorSound.play();
                                         talkProgress++;
                                         break;
@@ -466,10 +493,7 @@ window.onload = function() {
                                         break;
 
                                     case 9:
-                                        scene.removeChild(message);
-                                        message=makeMessage("ミラ「な、なんであかないのーっ！？」");
-                                        scene.addChild(message);
-                                        talkProgress++;
+                                        
                                         break;
 
                                     case 10:
@@ -494,6 +518,7 @@ window.onload = function() {
                                         break;
 
                                     case 12:
+                                        scene.removeChild(message);
                                         knockSound.play();
                                         talkProgress++;
                                         break;
@@ -502,11 +527,32 @@ window.onload = function() {
 
                                         break;
 
+                                    case 14:
+                                        
+                                        break;
+
+                                    case 14:
+                                        scene.removeChild(message);
+                                        message=makeMessage("ミラ「こんなことであきらめちゃダメ、だよね。うん、がんばれわたし！」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+
+                                    case 15:
+                                        scene.removeChild(message);
+                                        message=makeMessage("ミラ「もしかしたら、ほかの出口があるかもしれない！　どうにかしてここから出よう！」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+
                                     default:
                                         scene.removeChild(message);
                                         eventKind=0;
                                         talkProgress=0;
                                         State=Nomal;
+                                        //futureSound.play();
+                                        //futureSound.loop=true;
+                                        //futureSound.volume=0.1;
                                         break;
                                 }
                                 break;
