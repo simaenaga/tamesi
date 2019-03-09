@@ -489,7 +489,6 @@ window.onload = function() {
                 switch(State){
                     //イベント中でない時で、イベントが横にある状態で画面タッチすると
                     case Nomal:
-                        //左上アイテムゲット
                         if(isSurroundEvent(playerToMapX(player.x),playerToMapY(player.y),player.direction,eventMap,0)){
                             buttonSound.play();
                             message=makeMessage('ミラ「本がいっぱいだー！」');
@@ -753,6 +752,179 @@ window.onload = function() {
         return scene;
 
     };
+
+    game.makeScene2 = function(){
+        var scene = new Scene();
+        var map = new Map(mapTileScale, mapTileScale);
+
+        //イベント判定用
+        var eventMap=new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            eventMap[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                eventMap[i][j]=-1;
+            }
+        }
+
+        //マップの背景作成
+        var array1 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array1[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                    array1[j][i]=33;
+            }
+        }
+
+        //マップの背景の上書き作成(アイテムなどの)
+        var array2 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array2[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array2[i][j]=-1;
+            }
+        }
+
+        //マップデータの作成
+        map.loadData(array1,array2,array0);
+
+        //衝突判定作成
+        var array3 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array3[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array3[i][j]=0;
+            }
+        }
+        
+        map.collisionData=array3;
+
+        var foregroundMap = new Map(16, 16);
+        foregroundMap.image = game.assets['heya_girl.png'];
+
+        var array4=new Array(mapArraySize);
+        for(var i=0;i<array4.length;i++){
+            array4[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<array4.length;i++){
+            for(var j=0;j<array4.length;j++){
+                array4[j][i]=-1;
+            }
+        }
+
+        foregroundMap.loadData(array4);   
+
+        //プレイヤーデータ作成
+        var player = new Sprite(32, 32);
+        player.x = 8 * 16 - 8;
+        player.y = 11 * 16;
+        var image = new Surface(96, 128);
+        image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
+        player.image = image;
+
+        State=GameEvent;
+        eventKind=1;
+        talkProgress=-1;
+
+        //プレイヤーの動き作成(いじらない)
+        player.isMoving = false;
+        player.direction = 0;
+        player.walk = 1;
+        player.addEventListener('enterframe', function() {
+            this.frame = this.direction * 3 + this.walk;
+            if (this.isMoving) {
+                this.moveBy(this.vx, this.vy);
+ 
+                if (!(game.frame % 3)) {
+                    this.walk++;
+                    this.walk %= 3;
+                }
+                if ((this.vx && (this.x-8) % 16 == 0) || (this.vy && this.y % 16 == 0)) {
+                    this.isMoving = false;
+                    this.walk = 1;
+                }
+            } else {
+                this.vx = this.vy = 0;
+                //イベント中は行動できない
+                if(State==Nomal){
+                    if (game.input.left) {
+                        this.direction = 1;
+                        this.vx = -4;
+                    } else if (game.input.right) {
+                        this.direction = 2;
+                        this.vx = 4;
+                    } else if (game.input.up) {
+                        this.direction = 3;
+                        this.vy = -4;
+                    } else if (game.input.down) {
+                        this.direction = 0;
+                        this.vy = 4;
+                    }
+                    if (this.vx || this.vy) {
+                        var x = this.x + (this.vx ? this.vx / Math.abs(this.vx) * 16 : 0) + 16;
+                        var y = this.y + (this.vy ? this.vy / Math.abs(this.vy) * 16 : 0) + 16;
+                        if (0 <= x && x < map.width && 0 <= y && y < map.height && !map.hitTest(x, y)) {
+                            this.isMoving = true;
+                            arguments.callee.call(this);
+                        }
+                    }
+                }
+            }
+        });
+
+        //マップ、キャラをグループ化して描画
+        var stage = new Group();
+        stage.addChild(map);
+        stage.addChild(player);
+        stage.addChild(foregroundMap);
+        scene.addChild(stage);
+
+        //パッド作成(いじらない)
+        var pad = new Pad();
+        pad.x = mapScale-100;
+        pad.y = mapScale-200;
+        scene.addChild(pad);
+
+        player.tick=0;
+        scene.addEventListener('enterframe', function(e) {
+            var x = Math.min((game.width  - 16) / 2 - player.x, 0);
+            var y = Math.min((game.height - 16) / 2 - player.y, 0);
+            x = Math.max(game.width,  x + map.width)  - map.width;
+            y = Math.max(game.height, y + map.height) - map.height;
+            stage.x = x;
+            stage.y = y;
+
+            //オートメッセージ処理などは、ここでする
+
+            
+        });
+
+        scene.addEventListener(Event.TOUCH_START , function(e) {
+
+            //パッド以外をタッチしたとき
+            if(touchJudge(e.x,e.y)){
+                switch(State){
+                    case Nomal://ノーマル状態で、イベントが発生した時の処理
+                        
+                        break;
+                    case GameEvent:    //イベントの種類ごとの処理
+                        switch(eventKind){
+                            
+                        }
+                        break;
+                }
+            }
+        });
+        return scene;
+    }
+
     game.start();
 
 };
