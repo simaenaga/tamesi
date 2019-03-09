@@ -291,9 +291,9 @@ window.onload = function() {
         image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
         player.image = image;
 
-        State=GameEvent;
+        /*State=Nomal;
         eventKind=1;
-        talkProgress=-1;
+        talkProgress=16;*/
 
         //プレイヤーの動き作成(いじらない)
         player.isMoving = false;
@@ -829,9 +829,9 @@ window.onload = function() {
         image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
         player.image = image;
 
-        State=GameEvent;
-        eventKind=1;
-        talkProgress=-1;
+        State=Nomal;
+        eventKind=0;
+        talkProgress=0;
 
         //プレイヤーの動き作成(いじらない)
         player.isMoving = false;
