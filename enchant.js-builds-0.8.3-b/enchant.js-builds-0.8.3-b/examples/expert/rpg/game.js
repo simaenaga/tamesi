@@ -337,9 +337,17 @@ window.onload = function() {
         image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
         player.image = image;
 
-        /*State=GameEvent;
-        eventKind=1;
-        talkProgress=-1;*/
+        //飛ばす時コメントアウトはずす
+        State=GameEvent;
+        eventKind=4;
+        talkProgress=9;
+
+
+
+        //プレイする時コメントアウトはずす
+        // State=GameEvent;
+        // eventKind=1;
+        // talkProgress=-1;
 
         //プレイヤーの動き作成(いじらない)
         player.isMoving = false;
@@ -873,21 +881,21 @@ window.onload = function() {
         }
         //広場
         for(var j=3;j<10;j+=2){
-            array1[j][4]=20*9+10;
+            array1[j][4]=20*10+10;
             for(var i=5; i<14; i+=2){
-                array1[j][i]=20*9+11;
-                array1[j][i+1]=20*9+12;
+                array1[j][i]=20*10+11;
+                array1[j][i+1]=20*10+12;
              }
-            array1[j][15]=20*9+13;
+            array1[j][15]=20*10+13;
 
 
 
-            array1[j+1][4]=20*10+10;
+            array1[j+1][4]=20*9+10;
             for(var i=5;i<14;i+=2){
-                array1[j+1][i]=20*10+11;
-                array1[j+1][i+1]=20*10+12;
+                array1[j+1][i]=20*9+11;
+                array1[j+1][i+1]=20*9+12;
             }
-            array1[j+1][15]=20*10+13;
+            array1[j+1][15]=20*9+13;
         }
 
 
@@ -975,8 +983,6 @@ window.onload = function() {
             }
         }
 
-
-
         //お墓
         array5[23][16] = 0;
         array5[23][17] = 1;
@@ -1031,6 +1037,30 @@ window.onload = function() {
         map4.loadData(array7);
 
 
+
+        //
+        // var map5 = new Map(16,16);
+        // map5.image = game.assets['nomen.png'];
+        // var array8=new Array(mapArraySize);
+        // for(var i=0;i<array8.length;i++){
+        //     array8[i]=new Array(mapArraySize);
+        // }
+        // for(var i=0;i<array8.length;i++){
+        //     for(var j=0;j<array8.length;j++){
+        //         array8[j][i]=-1;
+        //     }
+        // }
+        // array8[9][5]=5*10+2;
+        // array8[9][6]=5*10+3;
+        // array8[10][5]=6*10+2;
+        // array8[10][6]=6*10+3;
+        // array8[11][5]=7*10+2;
+        // array8[11][6]=7*10+3;
+        //
+        //
+        // map5.loadData(array8);
+
+
         //プレイヤーデータ作成
         var player = new Sprite(32, 32);
         player.x = 9 * 16 - 8;
@@ -1039,9 +1069,12 @@ window.onload = function() {
         image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
         player.image = image;
 
-        /*State=GameEvent;
-        eventKind=1;
-        talkProgress=-1;*/
+        //プレイするとき
+        // State=GameEvent;
+        // eventKind=1;
+        // talkProgress=-1;
+
+        //デバック時
         State=Nomal;
         eventKind=0;
         talkProgress=0;
@@ -1097,9 +1130,10 @@ window.onload = function() {
         stage.addChild(map);
         stage.addChild(player);
         stage.addChild(foregroundMap);
-        stage.addChild(map2);
+        // stage.addChild(map2);
         stage.addChild(map3);
         stage.addChild(map4);
+        // stage.addChild(map5);
         scene.addChild(stage);
 
         //パッド作成(いじらない)
