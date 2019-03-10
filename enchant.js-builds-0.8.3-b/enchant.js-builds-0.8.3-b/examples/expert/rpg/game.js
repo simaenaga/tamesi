@@ -934,7 +934,7 @@ window.onload = function() {
 
         for(var i=4;i<17;i++){
             array3[2][i]=1;
-            if(i>=11||i<=8){array3[11][i]=1;}
+            if(i>11||i<8){array3[11][i]=1;}
         }
 
         for(var j=3;j<11;j++){
