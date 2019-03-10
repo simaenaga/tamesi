@@ -24,7 +24,7 @@ window.onload = function() {
     enchant.Sound.enabledInMobileSafari = true;
     var game = new Game(mapScale, mapScale);
     game.fps = 15;
-    game.preload('map1.gif', 'chara0.gif','heya_girl.png','heya_girl2.png','obakeEnterMirror.png','obakeOut.mp3','door.mp3','Knock.mp3','future.mp3','musmus_btn_set\\btn01.mp3','bird.mp3','darkwhole.mp3','obake.mp3','oinarisama.png','ohaka.png','nomen.png');
+    game.preload('map1.gif', 'chara0.gif','heya_girl.png','heya_girl2.png','makkuraEnterMirror.png','makkuraOut.mp3','door.mp3','Knock.mp3','future.mp3','musmus_btn_set\\btn01.mp3','bird.mp3','darkwhole.mp3','makkura.mp3','oinarisama.png');
 
     //サウンドクラス
     SoundLoop = Class.create(Sprite, {
@@ -807,19 +807,19 @@ window.onload = function() {
 
     };
 
-    //お化け屋敷
+    //まっくら石畳の道
     game.makeScene2 = function(){
         var scene = new Scene();
         var map = new Map(mapTileScale, mapTileScale);
         map.image = game.assets['oinarisama.png'];
-        var obakeSound = 'obake.mp3';
-        var obakeEnterSound = game.assets['obakeOut.mp3'].clone();
+        var makkuraSound = 'makkura.mp3';
+        var makkuraEnterSound = game.assets['makkuraOut.mp3'].clone();
         var buttonSound = game.assets['musmus_btn_set\\btn01.mp3'].clone();
 
 
         //ループ音声再生
         var M_Sound=new SoundLoop(game);
-        M_Sound.Set(obakeSound);
+        M_Sound.Set(makkuraSound);
 
 
         var array0 = new Array(mapArraySize);
@@ -971,7 +971,7 @@ window.onload = function() {
 
 
         var map2 = new Map(16, 16);
-        map2.image = game.assets['ohaka.png'];
+        map2.image = game.assets['heya_girl.png'];
 
         var array5=new Array(mapArraySize);
         for(var i=0;i<array5.length;i++){
@@ -982,13 +982,6 @@ window.onload = function() {
                 array5[j][i]=-1;
             }
         }
-
-        //お墓
-        array5[23][16] = 0;
-        array5[23][17] = 1;
-        array5[24][16] = 8;
-        array5[24][17] = 8+1;
-
 
         map2.loadData(array5);
 
@@ -1018,7 +1011,7 @@ window.onload = function() {
         map3.loadData(array6);
 
         var map4 = new Map(16,16);
-        map4.image = game.assets['obakeEnterMirror.png'];
+        map4.image = game.assets['makkuraEnterMirror.png'];
         var array7=new Array(mapArraySize);
         for(var i=0;i<array7.length;i++){
             array7[i]=new Array(mapArraySize);
@@ -1219,7 +1212,7 @@ window.onload = function() {
                     talkProgress++;
                 }
             }else if(eventKind==2 && talkProgress == 4){
-                obakeEnterSound.play();
+                makkuraEnterSound.play();
                 message=screenDark(0.6);
                 scene.addChild(message);
                 player.tick=0;
