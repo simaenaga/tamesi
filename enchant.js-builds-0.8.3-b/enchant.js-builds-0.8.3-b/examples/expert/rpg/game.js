@@ -337,9 +337,9 @@ window.onload = function() {
         image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
         player.image = image;
 
-        /*State=GameEvent;
+        State=GameEvent;
         eventKind=1;
-        talkProgress=-1;*/
+        talkProgress=-1;
 
         //プレイヤーの動き作成(いじらない)
         player.isMoving = false;
@@ -809,7 +809,7 @@ window.onload = function() {
         var buttonSound = game.assets['musmus_btn_set\\btn01.mp3'].clone();
 
 
-        //ループ音声再生
+
         var M_Sound=new SoundLoop(game);
         M_Sound.Set(obakeSound);
 
@@ -1031,6 +1031,19 @@ window.onload = function() {
         map4.loadData(array7);
 
 
+        var map5 = new Map(16,16);
+        map5.image = game.assets['nomen.png'];
+        var array8=new Array(mapArraySize);
+        for(var i=0;i<array8.length;i++){
+            array8[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<array8.length;i++){
+            for(var j=0;j<array8.length;j++){
+                array8[j][i]=-1;
+            }
+        }
+
+
         //プレイヤーデータ作成
         var player = new Sprite(32, 32);
         player.x = 9 * 16 - 8;
@@ -1039,12 +1052,9 @@ window.onload = function() {
         image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
         player.image = image;
 
-        /*State=GameEvent;
+        State=GameEvent;
         eventKind=1;
-        talkProgress=-1;*/
-        State=Nomal;
-        eventKind=0;
-        talkProgress=0;
+        talkProgress=-1;
 
         //プレイヤーの動き作成(いじらない)
         player.isMoving = false;
@@ -1138,8 +1148,6 @@ window.onload = function() {
             }else if(eventKind==1 && talkProgress == 5){
                 player.tick++;
                 if(player.tick == 68){
-                    buttonSound.play();
-
                     message=makeMessage("ミラ「かがみの向こう、なのかな」");
                     scene.addChild(message);
                     talkProgress++;
@@ -1178,35 +1186,10 @@ window.onload = function() {
             if(eventKind==1 && talkProgress == 11){
                 player.tick++;
                 if(player.tick == 130){
-                  buttonSound.play();
-
                     message=makeMessage("ミラ「......とりあえず進んでみよう。帰るのはいつでもできるよね」");
                     scene.addChild(message);
                     talkProgress++;
                 }
-            }else if(eventKind==2 && talkProgress == 4){
-                obakeEnterSound.play();
-                message=screenDark(0.6);
-                scene.addChild(message);
-                player.tick=0;
-                talkProgress++;
-            }else if(eventKind==2 && talkProgress == 5){
-                player.tick++;
-                if(player.tick==16){
-                    message=screenDark(0.6);
-                    scene.addChild(message);
-                    player.tick=0;
-                    talkProgress++;
-                }
-            }else if(eventKind==2 && talkProgress == 6){
-                player.tick++;
-                if(player.tick==16){
-                    message=screenDark(1);
-                    scene.addChild(message);
-                    player.tick=0;
-                    talkProgress++;
-                }
-            }else if(eventKind==2 && talkProgress == 7){
 
             }
 
@@ -1255,6 +1238,7 @@ window.onload = function() {
                                         break;
 
                                     case 1:
+                                        buttonSound.play();
                                         scene.removeChild(message);
                                         talkProgress++;
                                         break;
@@ -1271,7 +1255,7 @@ window.onload = function() {
                                         break;
 
                                     case 6:
-
+                                        buttonSound.play();
                                         scene.removeChild(message);
                                         talkProgress++;
                                     break;
@@ -1283,6 +1267,7 @@ window.onload = function() {
                                         break;
 
                                     case 9:
+                                        buttonSound.play();
                                         scene.removeChild(message);
                                         talkProgress++;
                                         break;
@@ -1295,6 +1280,7 @@ window.onload = function() {
                                         break;
 
                                     default:
+                                        buttonSound.play();
                                         scene.removeChild(message);
                                         eventKind=0;
                                         talkProgress=0;
@@ -1320,23 +1306,13 @@ window.onload = function() {
                                         talkProgress++;
                                         break;
                                     case 3:
-                                        M_Sound.Stop(Sound);//ループＢＧＭの停止
-
+                                        buttonSound.play();
                                         scene.removeChild(message);
-                                        talkProgress++;
-                                        break;
-
-                                    case 4:
-                                        break;
-
-                                    case 5:
-                                        break;
-
-                                    case 6:
-                                        break;
-
-                                    case 7:
-                                        break;
+                                      talkProgress++;
+                                      break;
+                                  default:
+                                      obakeOut.play();
+                                      talkProgress=0;
                               }
                                 break;
                             case 3:
