@@ -24,7 +24,7 @@ window.onload = function() {
     enchant.Sound.enabledInMobileSafari = true;
     var game = new Game(mapScale, mapScale);
     game.fps = 15;
-    game.preload('map1.gif', 'chara0.gif','heya_girl.png','heya_girl2.png','obakeEnterMirror.png','obakeOut.mp3','door.mp3','Knock.mp3','future.mp3','musmus_btn_set\\btn01.mp3','bird.mp3','darkwhole.mp3','obake.mp3','oinarisama.png','ohaka.png','nomen.png');
+    game.preload('map1.gif', 'chara0.gif','heya_girl.png','heya_girl2.png','makkuraEnterMirror.png','makkuraOut.mp3','door.mp3','Knock.mp3','future.mp3','musmus_btn_set\\btn01.mp3','bird.mp3','darkwhole.mp3','makkura.mp3','oinarisama.png');
 
     //サウンドクラス
     SoundLoop = Class.create(Sprite, {
@@ -337,6 +337,14 @@ window.onload = function() {
         image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
         player.image = image;
 
+        //飛ばす時コメントアウトはずす
+        // State=GameEvent;
+        // eventKind=4;
+        // talkProgress=9;
+
+
+
+        //プレイする時コメントアウトはずす
         State=GameEvent;
         eventKind=1;
         talkProgress=-1;
@@ -799,19 +807,19 @@ window.onload = function() {
 
     };
 
-    //お化け屋敷
+    //まっくら石畳の道
     game.makeScene2 = function(){
         var scene = new Scene();
         var map = new Map(mapTileScale, mapTileScale);
         map.image = game.assets['oinarisama.png'];
-        var obakeSound = 'obake.mp3';
-        var obakeEnterSound = game.assets['obakeOut.mp3'].clone();
+        var makkuraSound = 'makkura.mp3';
+        var makkuraEnterSound = game.assets['makkuraOut.mp3'].clone();
         var buttonSound = game.assets['musmus_btn_set\\btn01.mp3'].clone();
 
 
-
+        //ループ音声再生
         var M_Sound=new SoundLoop(game);
-        M_Sound.Set(obakeSound);
+        M_Sound.Set(makkuraSound);
 
 
         var array0 = new Array(mapArraySize);
@@ -873,21 +881,21 @@ window.onload = function() {
         }
         //広場
         for(var j=3;j<10;j+=2){
-            array1[j][4]=20*9+10;
+            array1[j][4]=20*10+10;
             for(var i=5; i<14; i+=2){
-                array1[j][i]=20*9+11;
-                array1[j][i+1]=20*9+12;
+                array1[j][i]=20*10+11;
+                array1[j][i+1]=20*10+12;
              }
-            array1[j][15]=20*9+13;
+            array1[j][15]=20*10+13;
 
 
 
-            array1[j+1][4]=20*10+10;
+            array1[j+1][4]=20*9+10;
             for(var i=5;i<14;i+=2){
-                array1[j+1][i]=20*10+11;
-                array1[j+1][i+1]=20*10+12;
+                array1[j+1][i]=20*9+11;
+                array1[j+1][i+1]=20*9+12;
             }
-            array1[j+1][15]=20*10+13;
+            array1[j+1][15]=20*9+13;
         }
 
 
@@ -926,7 +934,7 @@ window.onload = function() {
 
         for(var i=4;i<17;i++){
             array3[2][i]=1;
-            if(i>=11||i<=8){array3[11][i]=1;}
+            if(i>11||i<8){array3[11][i]=1;}
         }
 
         for(var j=3;j<11;j++){
@@ -963,7 +971,7 @@ window.onload = function() {
 
 
         var map2 = new Map(16, 16);
-        map2.image = game.assets['ohaka.png'];
+        map2.image = game.assets['heya_girl.png'];
 
         var array5=new Array(mapArraySize);
         for(var i=0;i<array5.length;i++){
@@ -974,15 +982,6 @@ window.onload = function() {
                 array5[j][i]=-1;
             }
         }
-
-
-
-        //お墓
-        array5[23][16] = 0;
-        array5[23][17] = 1;
-        array5[24][16] = 8;
-        array5[24][17] = 8+1;
-
 
         map2.loadData(array5);
 
@@ -1012,7 +1011,7 @@ window.onload = function() {
         map3.loadData(array6);
 
         var map4 = new Map(16,16);
-        map4.image = game.assets['obakeEnterMirror.png'];
+        map4.image = game.assets['makkuraEnterMirror.png'];
         var array7=new Array(mapArraySize);
         for(var i=0;i<array7.length;i++){
             array7[i]=new Array(mapArraySize);
@@ -1031,6 +1030,30 @@ window.onload = function() {
         map4.loadData(array7);
 
 
+
+        //
+        // var map5 = new Map(16,16);
+        // map5.image = game.assets['nomen.png'];
+        // var array8=new Array(mapArraySize);
+        // for(var i=0;i<array8.length;i++){
+        //     array8[i]=new Array(mapArraySize);
+        // }
+        // for(var i=0;i<array8.length;i++){
+        //     for(var j=0;j<array8.length;j++){
+        //         array8[j][i]=-1;
+        //     }
+        // }
+        // array8[9][5]=5*10+2;
+        // array8[9][6]=5*10+3;
+        // array8[10][5]=6*10+2;
+        // array8[10][6]=6*10+3;
+        // array8[11][5]=7*10+2;
+        // array8[11][6]=7*10+3;
+        //
+        //
+        // map5.loadData(array8);
+
+
         //プレイヤーデータ作成
         var player = new Sprite(32, 32);
         player.x = 9 * 16 - 8;
@@ -1039,9 +1062,15 @@ window.onload = function() {
         image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
         player.image = image;
 
+        // プレイするとき
         State=GameEvent;
         eventKind=1;
         talkProgress=-1;
+
+        //デバック時
+        // State=Nomal;
+        // eventKind=0;
+        // talkProgress=0;
 
         //プレイヤーの動き作成(いじらない)
         player.isMoving = false;
@@ -1094,9 +1123,10 @@ window.onload = function() {
         stage.addChild(map);
         stage.addChild(player);
         stage.addChild(foregroundMap);
-        stage.addChild(map2);
+        // stage.addChild(map2);
         stage.addChild(map3);
         stage.addChild(map4);
+        // stage.addChild(map5);
         scene.addChild(stage);
 
         //パッド作成(いじらない)
@@ -1135,6 +1165,8 @@ window.onload = function() {
             }else if(eventKind==1 && talkProgress == 5){
                 player.tick++;
                 if(player.tick == 68){
+                    buttonSound.play();
+
                     message=makeMessage("ミラ「かがみの向こう、なのかな」");
                     scene.addChild(message);
                     talkProgress++;
@@ -1173,10 +1205,35 @@ window.onload = function() {
             if(eventKind==1 && talkProgress == 11){
                 player.tick++;
                 if(player.tick == 130){
+                  buttonSound.play();
+
                     message=makeMessage("ミラ「......とりあえず進んでみよう。帰るのはいつでもできるよね」");
                     scene.addChild(message);
                     talkProgress++;
                 }
+            }else if(eventKind==2 && talkProgress == 4){
+                makkuraEnterSound.play();
+                message=screenDark(0.6);
+                scene.addChild(message);
+                player.tick=0;
+                talkProgress++;
+            }else if(eventKind==2 && talkProgress == 5){
+                player.tick++;
+                if(player.tick==16){
+                    message=screenDark(0.6);
+                    scene.addChild(message);
+                    player.tick=0;
+                    talkProgress++;
+                }
+            }else if(eventKind==2 && talkProgress == 6){
+                player.tick++;
+                if(player.tick==16){
+                    message=screenDark(1);
+                    scene.addChild(message);
+                    player.tick=0;
+                    talkProgress++;
+                }
+            }else if(eventKind==2 && talkProgress == 7){
 
             }
 
@@ -1225,7 +1282,6 @@ window.onload = function() {
                                         break;
 
                                     case 1:
-                                        buttonSound.play();
                                         scene.removeChild(message);
                                         talkProgress++;
                                         break;
@@ -1242,7 +1298,7 @@ window.onload = function() {
                                         break;
 
                                     case 6:
-                                        buttonSound.play();
+
                                         scene.removeChild(message);
                                         talkProgress++;
                                     break;
@@ -1254,7 +1310,6 @@ window.onload = function() {
                                         break;
 
                                     case 9:
-                                        buttonSound.play();
                                         scene.removeChild(message);
                                         talkProgress++;
                                         break;
@@ -1267,7 +1322,6 @@ window.onload = function() {
                                         break;
 
                                     default:
-                                        buttonSound.play();
                                         scene.removeChild(message);
                                         eventKind=0;
                                         talkProgress=0;
@@ -1293,13 +1347,23 @@ window.onload = function() {
                                         talkProgress++;
                                         break;
                                     case 3:
-                                        buttonSound.play();
+                                        M_Sound.Stop(Sound);//ループＢＧＭの停止
+
                                         scene.removeChild(message);
-                                      talkProgress++;
-                                      break;
-                                  default:
-                                      obakeOut.play();
-                                      talkProgress=0;
+                                        talkProgress++;
+                                        break;
+
+                                    case 4:
+                                        break;
+
+                                    case 5:
+                                        break;
+
+                                    case 6:
+                                        break;
+
+                                    case 7:
+                                        break;
                               }
                                 break;
                             case 3:
