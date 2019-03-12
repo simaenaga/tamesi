@@ -16,8 +16,8 @@ var mapArraySize= 30;//一つの方向にあるマップ画像数
 var windowY=4;
 var bgm=false;//bgmかけるかどうか
 var nowScene=1;//今のシーン（シーン遷移用）
-var previousScene=2;//前のシーン
-var nextScene=0;//複数シーンをワンシーンとして扱う用
+var previousScene=1;//前のシーン
+var nextScene=1;//複数シーンをワンシーンとして扱う用
 var previousCharaLocate=0;//シーン遷移後のプレイヤーの位置調整用
 
 for(var i=0;i<itemList.length;i++){
@@ -100,7 +100,7 @@ window.onload = function() {
 
         game.rootScene.addEventListener(Event.TOUCH_START, function(e) {
             game.rootScene.removeChild(map);
-            game.pushScene(game.makeScene3());
+            game.pushScene(game.makeScene1());
         });
         game.rootScene.addEventListener('enterframe', function(e) {
             switch(nowScene){
@@ -108,7 +108,9 @@ window.onload = function() {
                     game.pushScene(game.makeScene2());
                     break;
                 case 3:
-                    game.pushScene(game.makeScene3_1());
+                    game.pushScene(game.makeScene3());
+                    break;
+                case 4:
                     break;
             }
         });
@@ -1150,12 +1152,20 @@ window.onload = function() {
         // stage.addChild(map5);
         scene.addChild(stage);
 
+        //パッド見える用
+        var mask=new Label();
+        mask.height=100;
+        mask.width=100;
+        mask.x=mapScale-100;
+        mask.y=mapScale-200;
+        mask.backgroundColor='rgba(255,255,255,0.1)';
+        scene.addChild(mask);
+
         //パッド作成(いじらない)
         var pad = new Pad();
         pad.x = mapScale-100;
         pad.y = mapScale-200;
         scene.addChild(pad);
-
 
 
         player.tick=0;
@@ -1418,10 +1428,10 @@ window.onload = function() {
         var wholeSound = game.assets['future.mp3'].clone();
 
         scene.addEventListener('enterframe', function(e) {
-            if(previousScene==2){
+            if(previousScene==2　|| nextScene==31){
                 game.pushScene(game.makeScene3_1(wholeSound));
             }else if(nextScene==32){
-
+                game.pushScene(game.makeScene3_2(wholeSound));
             }else{
                 game.popScene();
             }
@@ -1450,8 +1460,8 @@ window.onload = function() {
             }
         }
 
-        eventMap[6][8]=0;
-        eventMap[13][8]=1;
+        eventMap[6][10]=0;
+        eventMap[13][10]=1;
         eventMap[13][17]=2;
 
         //マップの背景作成
@@ -1490,11 +1500,11 @@ window.onload = function() {
             }
         }
         //マット
-        array2[8][7]=62*16+15;
-        array2[9][7]=63*16+15;
+        array2[10][7]=62*16+15;
+        array2[11][7]=63*16+15;
 
-        array2[8][12]=62*16+10;
-        array2[9][12]=63*16+10;
+        array2[10][12]=62*16+10;
+        array2[11][12]=63*16+10;
 
         array2[17][12]=62*16+10;
         array2[18][12]=63*16+10;
@@ -1535,18 +1545,18 @@ window.onload = function() {
         }
 
         //階段衝突
-        array3[12][9]=1;
-        array3[13][9]=1;
         array3[14][9]=1;
         array3[15][9]=1;
+        array3[16][9]=1;
+        array3[17][9]=1;
 
-        array3[15][7]=1;
-        array3[15][8]=1;
-        array3[15][9]=1;
+        array3[17][7]=1;
+        array3[17][8]=1;
+        array3[17][9]=1;
 
-        array3[12][7]=1;
-        array3[12][8]=1;
-        array3[12][9]=1;
+        array3[14][7]=1;
+        array3[14][8]=1;
+        array3[14][9]=1;
 
         map.collisionData=array3;
 
@@ -1564,19 +1574,19 @@ window.onload = function() {
             }
         }
 
-        array4[10][7]=86*16+2;
-        array4[10][8]=86*16+3;
-        array4[11][7]=87*16+2;
-        array4[11][8]=87*16+3;
-        array4[12][7]=88*16+2;
-        array4[12][8]=88*16+3;
-        array4[12][9]=88*16+4;
-        array4[13][7]=89*16+2;
-        array4[13][8]=89*16+3;
-        array4[13][9]=89*16+4;
-        array4[15][7]=91*16+2;
-        array4[15][8]=91*16+3;
-        array4[15][9]=91*16+4;
+        array4[12][7]=86*16+2;
+        array4[12][8]=86*16+3;
+        array4[13][7]=87*16+2;
+        array4[13][8]=87*16+3;
+        array4[14][7]=88*16+2;
+        array4[14][8]=88*16+3;
+        array4[14][9]=88*16+4;
+        array4[15][7]=89*16+2;
+        array4[15][8]=89*16+3;
+        array4[15][9]=89*16+4;
+        array4[17][7]=91*16+2;
+        array4[17][8]=91*16+3;
+        array4[17][9]=91*16+4;
 
         map2.loadData(array4);
         map2.y+=6;
@@ -1594,11 +1604,11 @@ window.onload = function() {
             }
         }
 
-        array5[10][9]=86*16+4;
-        array5[11][9]=87*16+4;
-        array5[14][7]=90*16+2;
-        array5[14][8]=90*16+3;
-        array5[14][9]=90*16+4;
+        array5[12][9]=86*16+4;
+        array5[13][9]=87*16+4;
+        array5[16][7]=90*16+2;
+        array5[16][8]=90*16+3;
+        array5[16][9]=90*16+4;
 
         map3.loadData(array5);
         map3.y+=6;
@@ -1664,7 +1674,7 @@ window.onload = function() {
         label.backgroundColor = "rgba(255,255,255,0.3)";
         label.height=mapTileScale;
         label.width=mapTileScale*2+8;
-        label.y=mapTileScale*12;
+        label.y=mapTileScale*14;
         label.x=mapTileScale*7;
 
         //マップ、キャラをグループ化して描画
@@ -1692,13 +1702,8 @@ window.onload = function() {
             eventKind=0;
             talkProgress=0;
             player.direction=1;
-            if(previousCharaLocate==0){
-                player.x = 12 * 16 - 8;
-                player.y = 7 * 16;
-            }else{
-                player.x = 12 * 16 - 8;
-                player.y = 8 * 16;
-            }
+            player.x = 12 * 16 - 8;
+            player.y = 9 * 16;
         }
 
         player.tick=0;
@@ -1767,7 +1772,7 @@ window.onload = function() {
                 player.direction = 1;
                 player.vx = -4;
                 player.isMoving=true;
-            }else if(eventKind==4 && talkProgress == 4 && playerToMapY(player.y)!=11){
+            }else if(eventKind==4 && talkProgress == 4 && playerToMapY(player.y)!=13){
                 player.vx = 0;
                 player.direction = 0;
                 player.vy = 4;
@@ -1813,8 +1818,8 @@ window.onload = function() {
                 switch(State){
                     //イベント中でない時で、イベントが横にある状態で画面タッチすると
                     case Nomal:
-                        message=makeMessage(playerToMapX(player.x)+','+playerToMapY(player.y));
-                        scene.addChild(message);
+                        //message=makeMessage(playerToMapX(player.x)+','+playerToMapY(player.y));
+                        //scene.addChild(message);
                         break;
                     case GameEvent:    //イベントの種類ごとの処理
                         switch(eventKind){
@@ -1915,6 +1920,528 @@ window.onload = function() {
 
     };
 
+    game.makeScene3_2 = function(wholeSound) {
+        var scene = new Scene();
+        var map = new Map(mapTileScale, mapTileScale);
+        map.image = game.assets['heya_girl.png'];
+        var buttonSound = game.assets['musmus_btn_set\\btn01.mp3'].clone();
+        var darkwholeSound = game.assets['makkuraOut.mp3'].clone();
+        var doorOpenSound = game.assets['door-open1.mp3'].clone();
+        var selectMessage1=selectMessage('はい',1);
+        var selectMessage2=selectMessage('いいえ',2);
+
+        //イベント判定用
+        var eventMap=new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            eventMap[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                eventMap[i][j]=-1;
+            }
+        }
+
+        eventMap[6][12]=0;
+        eventMap[14][12]=1;
+        eventMap[15][12]=1;
+        eventMap[17][12]=2;
+        eventMap[18][12]=2;
+        eventMap[7][7]=3;
+        eventMap[8][7]=3;
+        eventMap[9][7]=3;
+        eventMap[10][7]=3;
+        eventMap[13][6]=4;
+        eventMap[14][6]=4;
+        eventMap[16][6]=5;
+        eventMap[17][6]=5;
+
+        //マップの背景作成
+        var array1 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array1[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                    array1[j][i]=33;
+            }
+        }
+
+        for(var i=7;i<19;i++){
+            for(var j=7;j<15;j++){
+                if(i%2==1)
+                    array1[j][i]=0;
+                else
+                    array1[j][i]=17;
+            }
+        }
+
+        for(var i=7;i<19;i++){
+            for(var j=2;j<7;j++){
+                array1[j][i]=5*16+1;
+            }
+        }
+        
+        for(var j=2;j<7;j++){
+            array1[j][7]=5*16+9;
+        }
+
+        //マップの背景の上書き作成(アイテムなどの)
+        var array2 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array2[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array2[i][j]=-1;
+            }
+        }
+
+        //窓
+        array2[2][12]=16*7+3;
+        array2[2][13]=16*7+3;
+        array2[3][12]=16*7+3;
+        array2[3][13]=16*7+3;
+        array2[2][14]=16*7+3;
+        array2[2][15]=16*7+3;
+        array2[3][14]=16*7+3;
+        array2[3][15]=16*7+3;
+
+        for(var i=0;i<4;i++){
+            for(var j=0;j<4;j++){
+                array2[j+3][i+12]=16*(14+j)+i;
+            }
+        }
+
+        //鏡作成
+        array2[3][16]=58*16+2;
+        array2[3][17]=58*16+3;
+        array2[4][16]=59*16+2;
+        array2[4][17]=59*16+3;
+        array2[5][16]=60*16+2;
+        array2[5][17]=60*16+3;
+        array2[6][16]=61*16+2;
+        array2[6][17]=61*16+3;
+        
+        //マット
+        array2[12][7]=16*62+15;
+        array2[13][7]=16*63+15;
+
+        //タンス
+        for(var i=0;i<4;i++){
+            for(var j=0;j<4;j++){
+                array2[5+i][7+j]=(22+i)*16+2+j;
+            }
+        }
+        
+        //カーテン用
+        var array0 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array0[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array0[i][j]=-1;
+            }
+        }
+
+        //カーテン
+        array0[3][12]=14*16+8;
+        array0[4][12]=15*16+8;
+        array0[5][12]=16*16+8;
+        array0[6][12]=17*16+8;
+
+        array0[3][15]=14*16+11;
+        array0[4][15]=15*16+11;
+        array0[5][15]=16*16+11;
+        array0[6][15]=17*16+11;
+
+        array0[3][14]=14*16+9;
+        array0[3][13]=14*16+10;
+
+        //マップデータの作成
+        map.loadData(array1,array2,array0);
+
+        //衝突判定作成
+        var array3 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array3[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array3[i][j]=0;
+            }
+        }
+
+        for(var i=0;i<10;i++){
+            array3[6+i][6]=1;
+            array3[6+i][19]=1;
+        }
+
+        for(var i=0;i<12;i++){
+            array3[6][7+i]=1;
+            array3[15][7+i]=1;
+        }
+        //青ベッド衝突
+        array3[11][14]=1;
+        array3[11][15]=1;
+        array3[13][14]=1;
+        array3[13][15]=1;
+        array3[14][14]=1;
+        array3[14][15]=1;
+
+        //赤ベッド衝突
+        array3[11][17]=1;
+        array3[11][18]=1;
+        array3[13][17]=1;
+        array3[13][18]=1;
+        array3[14][17]=1;
+        array3[14][18]=1;
+
+        //タンス衝突
+        array3[7][7]=1;
+        array3[7][8]=1;
+        array3[7][9]=1;
+        array3[7][10]=1;
+
+        map.collisionData=array3;
+
+        var foregroundMap = new Map(16, 16);
+        foregroundMap.image = game.assets['heya_girl.png'];
+
+        var array4=new Array(mapArraySize);
+        for(var i=0;i<array4.length;i++){
+            array4[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<array4.length;i++){
+            for(var j=0;j<array4.length;j++){
+                array4[j][i]=-1;
+            }
+        }
+
+        //ベッド作成(青、赤)
+        array2[11][17]=23*16+12;
+        array2[12][17]=24*16+12;
+        array4[13][17]=25*16+12;
+        array4[14][17]=26*16+12;
+        array2[11][18]=23*16+13;
+        array2[12][18]=24*16+13;
+        array4[13][18]=25*16+13;
+        array4[14][18]=26*16+13;
+
+        array2[11][14]=23*16+14;
+        array2[12][14]=24*16+14;
+        array4[13][14]=25*16+14;
+        array4[14][14]=26*16+14;
+        array2[11][15]=23*16+15;
+        array2[12][15]=24*16+15;
+        array4[13][15]=25*16+15;
+        array4[14][15]=26*16+15;
+        foregroundMap.loadData(array4);
+
+        var foregroundMap2 = new Map(16, 16);
+        foregroundMap2.image = game.assets['heya_girl.png'];
+
+        var array5=new Array(mapArraySize);
+        for(var i=0;i<array5.length;i++){
+            array5[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<array5.length;i++){
+            for(var j=0;j<array5.length;j++){
+                array5[j][i]=-1;
+            }
+        }
+
+        array5[12][17]=20*16+12;
+        array5[13][17]=21*16+12;
+        array5[12][18]=20*16+13;
+        array5[13][18]=21*16+13;
+
+        array5[12][14]=20*16+14;
+        array5[13][14]=21*16+14;
+        array5[12][15]=20*16+15;
+        array5[13][15]=21*16+15;
+        foregroundMap2.loadData(array5);
+        foregroundMap2.y+=1;
+        //ベッド作成ここまで
+
+
+        //プレイヤーデータ作成
+        var player = new Sprite(32, 32);
+        player.x = 8 * 16 - 8;
+        player.y = 11 * 16;
+        var image = new Surface(96, 128);
+        image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
+        player.image = image;
+
+        //プレイヤーの動き作成(いじらない)
+        player.isMoving = false;
+        //player.direction = 0;
+        player.walk = 1;
+        player.addEventListener('enterframe', function() {
+            this.frame = this.direction * 3 + this.walk;
+            if (this.isMoving) {
+                this.moveBy(this.vx, this.vy);
+
+                if (!(game.frame % 3)) {
+                    this.walk++;
+                    this.walk %= 3;
+                }
+                if ((this.vx && (this.x-8) % 16 == 0) || (this.vy && this.y % 16 == 0)) {
+                    this.isMoving = false;
+                    this.walk = 1;
+                }
+            } else {
+                this.vx = this.vy = 0;
+                //イベント中は行動できない
+                if(State==Nomal){
+                    if (game.input.left) {
+                        this.direction = 1;
+                        this.vx = -4;
+                    } else if (game.input.right) {
+                        this.direction = 2;
+                        this.vx = 4;
+                    } else if (game.input.up) {
+                        this.direction = 3;
+                        this.vy = -4;
+                    } else if (game.input.down) {
+                        this.direction = 0;
+                        this.vy = 4;
+                    }
+                    if (this.vx || this.vy) {
+                        var x = this.x + (this.vx ? this.vx / Math.abs(this.vx) * 16 : 0) + 16;
+                        var y = this.y + (this.vy ? this.vy / Math.abs(this.vy) * 16 : 0) + 16;
+                        if (0 <= x && x < map.width && 0 <= y && y < map.height && !map.hitTest(x, y)) {
+                            this.isMoving = true;
+                            arguments.callee.call(this);
+                        }
+                    }
+                }
+            }
+        });
+
+        //前のシーンに応じてこのシーンの状態変更
+        if(previousScene==31){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=2;
+            player.x = 7 * 16 - 8;
+            player.y = 11 * 16;
+        }
+
+        //マップ、キャラをグループ化して描画
+        var stage = new Group();
+        stage.addChild(map);
+        stage.addChild(player);
+        stage.addChild(foregroundMap);
+        stage.addChild(foregroundMap2);
+        scene.addChild(stage);
+
+        //パッド作成(いじらない)
+        var pad = new Pad();
+        pad.x = mapScale-100;
+        pad.y = mapScale-200;
+        scene.addChild(pad);
+
+        player.tick=0;
+        scene.addEventListener('enterframe', function(e) {
+            var x = Math.min((game.width  - 16) / 2 - player.x, 0);
+            var y = Math.min((game.height - 16) / 2 - player.y, 0);
+            x = Math.max(game.width,  x + map.width)  - map.width;
+            y = Math.max(game.height, y + map.height) - map.height;
+            stage.x = x;
+            stage.y = y;
+
+            if(bgm==true){
+                wholeSound.play();
+            }
+
+            if(State==Nomal){
+                if(game.input.left && isSurroundEvent(playerToMapX(player.x),playerToMapY(player.y),player.direction,eventMap,0)){
+                    doorOpenSound.play();
+                    eventKind=1;
+                    State=GameEvent;
+                }
+            }
+
+            /*if(eventKind==1 && talkProgress == -1){
+                player.tick++;
+                if(player.tick==48){
+                    player.tick=0;
+                    buttonSound.play();
+                    message=makeMessage("ミラ「うー、ねむいー・・・・・」");
+                    scene.addChild(message);
+                    talkProgress++;
+                }
+            }*/
+
+            if(eventKind==1){
+                player.tick++;
+                if(player.tick==15){
+                    player.tick=0;
+                    nextScene=31;
+                    previousScene=32;
+                    game.popScene();
+                }
+            }else if(eventKind==5 && talkProgress == 0){
+                if(game.input.up && selectState==2){
+                    scene.removeChild(select);
+                    buttonSound.play();
+                    selectState=1;
+                    select=selectWindow(selectState);
+                    scene.addChild(select);
+                }else if(game.input.down && selectState==1){
+                    scene.removeChild(select);
+                    buttonSound.play();
+                    selectState=2;
+                    select=selectWindow(selectState);
+                    scene.addChild(select);
+                }
+            }else if(eventKind==5 && talkProgress == 1){
+                darkwholeSound.play();
+                message=screenDark(0.6);
+                scene.addChild(message);
+                player.tick=0;
+                talkProgress++;
+            }else if(eventKind==5 && talkProgress == 2){
+                player.tick++;
+                if(player.tick==8){
+                    message=screenDark(0.6);
+                    scene.addChild(message);
+                    player.tick=0;
+                    talkProgress++;
+                }
+            }else if(eventKind==5 && talkProgress == 3){
+                player.tick++;
+                if(player.tick==8){
+                    player.tick=0;
+                    talkProgress++;
+                    nowScene=4;
+                    nextScene=4;
+                    previousScene=32;
+                    game.popScene();
+                }
+            }
+
+
+        });
+
+        scene.addEventListener(Event.TOUCH_START , function(e) {
+
+            //パッド以外をタッチしたとき
+            if(touchJudge(e.x,e.y)){
+                switch(State){
+                    //イベント中でない時で、イベントが横にある状態で画面タッチすると
+                    case Nomal:
+                        if(isSurroundEvent(playerToMapX(player.x),playerToMapY(player.y),player.direction,eventMap,4)){
+                            buttonSound.play();
+                            message=makeMessage('カギは開かないみたいだ...');
+                            scene.addChild(message);
+                            eventKind=2;
+                            State=GameEvent;
+                        }else if( isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,1)){
+                            buttonSound.play();
+                            message=makeMessage('お父さんのおふとん');
+                            scene.addChild(message);
+                            eventKind=3;
+                            State=GameEvent;
+                        }else if( isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,2)){
+                            buttonSound.play();
+                            message=makeMessage('お母さんのおふとん');
+                            scene.addChild(message);
+                            eventKind=4;
+                            State=GameEvent;
+                        }else if(isSurroundEvent(playerToMapX(player.x),playerToMapY(player.y),player.direction,eventMap,3)){
+                            buttonSound.play();
+                            message=makeMessage('お父さんとお母さんの着替えが入っている');
+                            scene.addChild(message);
+                            eventKind=6;
+                            State=GameEvent;
+                        }else if(isSurroundEvent(playerToMapX(player.x),playerToMapY(player.y),player.direction,eventMap,5)){
+                            buttonSound.play();
+                            message=makeMessage('鏡を調べますか？');
+                            scene.addChild(message);
+                            scene.addChild(selectMessage1);
+                            scene.addChild(selectMessage2);
+                            selectState=2;
+                            select=selectWindow(selectState);
+                            scene.addChild(select);
+                            eventKind=5;
+                            State=GameEvent;
+                        }
+                        break;
+                    case GameEvent:    //イベントの種類ごとの処理
+                        switch(eventKind){
+                            case 1:
+                                switch(talkProgress){//トークイベントの時は、トーク進捗度により処理変更
+                                    case -1:
+
+                                        break;
+
+                                    case 0:
+                                        scene.removeChild(message);
+                                        player.direction = 2;
+                                        player.vx = 4;
+                                        player.isMoving=true;
+                                        talkProgress++;
+                                        break;
+                                }
+                                break;
+                            case 2:
+                                scene.removeChild(message);
+                                State=Nomal;
+                                eventKind=0;
+                                break;
+                            case 3:
+                                scene.removeChild(message);
+                                State=Nomal;
+                                eventKind=0;
+                                break;
+                            case 4:
+                                scene.removeChild(message);
+                                State=Nomal;
+                                eventKind=0;
+                                break;
+                            case 5:
+                                switch(talkProgress){
+                                    case 0:
+                                        scene.removeChild(message);
+                                        scene.removeChild(select);
+                                        scene.removeChild(selectMessage1);
+                                        scene.removeChild(selectMessage2);
+                                        if(selectState==1){
+                                            bgm=false;
+                                            wholeSound.stop();
+                                            talkProgress++;
+                                        }else{
+                                            talkProgress=0;
+                                            State=Nomal;
+                                            eventKind=0;
+                                        }
+                                        break;
+                                    case 1:
+                                        break;
+                                    case 2:
+                                        break;
+                                    case 3:
+                                        break;
+                                }
+                                break;
+                            case 6:
+                                scene.removeChild(message);
+                                State=Nomal;
+                                eventKind=0;
+                                break;
+                            
+                        }
+                        break;
+                }
+            }
+        });
+        return scene;
+
+    };
+
     game.start();
 
 };
@@ -1928,6 +2455,14 @@ function makeMessage(text){
     label.height=mapTileScale*6;
     label.y=mapScale-label.height;
     label.width=mapScale;
+    return label;
+}
+
+function selectMessage(text,lebel){
+    var label = new Label(text);
+    label.font="16px monospace";
+    label.color = "rgb(255,255,255)";
+    label.y=mapScale-mapTileScale*6+lebel*16;
     return label;
 }
 
