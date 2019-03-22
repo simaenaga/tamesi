@@ -13,22 +13,23 @@ var mapScale=320;//マップの大きさ
 var mapTileScale=16;//マップ画像一つ分の大きさ
 var itemList=new Array(10);//拾ったアイテム判定用
 var mapArraySize= 30;//一つの方向にあるマップ画像数
-var windowY=4;
+var windowY=1;
 var bgm=false;//bgmかけるかどうか
-var nowScene=1;//今のシーン（シーン遷移用）
-var previousScene=1;//前のシーン
-var nextScene=1;//複数シーンをワンシーンとして扱う用
+var nowScene=4;//今のシーン（シーン遷移用）
+var previousScene=44;//前のシーン
+var nextScene=45;//複数シーンをワンシーンとして扱う用
 var previousCharaLocate=0;//シーン遷移後のプレイヤーの位置調整用
 
 for(var i=0;i<itemList.length;i++){
     itemList[i]=0;
 }
+itemList[0]=1;
 
 window.onload = function() {
     enchant.Sound.enabledInMobileSafari = true;
     var game = new Game(mapScale, mapScale);
     game.fps = 15;
-    game.preload('map1.gif', 'chara0.gif','heya_girl.png','heya_girl2.png','makkuraEnterMirror.png','makkuraOut.mp3','door.mp3','Knock.mp3','future.mp3','musmus_btn_set\\btn01.mp3','bird.mp3','darkwhole.mp3','makkura.mp3','oinarisama.png','stair2.png','ie0.png','door-open1.mp3');
+    game.preload('music.mp3','chara.gif','map1.gif', 'chara0.gif','heya_girl.png','heya_girl2.png','makkuraEnterMirror.png','makkuraOut.mp3','door.mp3','Knock.mp3','future.mp3','musmus_btn_set\\btn01.mp3','bird.mp3','darkwhole.mp3','makkura.mp3','oinarisama.png','stair2.png','ie0.png','door-open1.mp3','nomen.png','run.mp3','death.mp3','gusari.mp3');
 
     //サウンドクラス
     SoundLoop = Class.create(Sprite, {
@@ -100,10 +101,18 @@ window.onload = function() {
 
         game.rootScene.addEventListener(Event.TOUCH_START, function(e) {
             game.rootScene.removeChild(map);
-            game.pushScene(game.makeScene1());
+            game.pushScene(game.controlScene());
         });
-        game.rootScene.addEventListener('enterframe', function(e) {
+
+    }
+
+    game.controlScene=function(){
+        var scene = new Scene();
+        scene.addEventListener('enterframe', function(e) {
             switch(nowScene){
+                case 1:
+                    game.pushScene(game.makeScene1());
+                    break;
                 case 2:
                     game.pushScene(game.makeScene2());
                     break;
@@ -111,10 +120,15 @@ window.onload = function() {
                     game.pushScene(game.makeScene3());
                     break;
                 case 4:
+                    game.pushScene(game.makeScene4());
                     break;
+                default:
+                    game.popScene();
             }
         });
-    }
+
+        return scene;
+    };
 
     game.makeScene1 = function() {
         var scene = new Scene();
@@ -140,6 +154,8 @@ window.onload = function() {
             }
         }
 
+        scene.backgroundColor ="black";
+
         eventMap[7][7]=0;
         eventMap[8][7]=0;
         eventMap[7][12]=1;
@@ -156,7 +172,7 @@ window.onload = function() {
         }
         for(var i=0;i<mapArraySize;i++){
             for(var j=0;j<mapArraySize;j++){
-                    array1[j][i]=33;
+                    array1[j][i]=-1;
             }
         }
 
@@ -418,6 +434,15 @@ window.onload = function() {
         stage.addChild(foregroundMap);
         stage.addChild(foregroundMap2);
         scene.addChild(stage);
+
+        //パッド見える用
+        var mask=new Label();
+        mask.height=100;
+        mask.width=100;
+        mask.x=mapScale-100;
+        mask.y=mapScale-200;
+        mask.backgroundColor='rgba(255,255,255,0.1)';
+        scene.addChild(mask);
 
         //パッド作成(いじらない)
         var pad = new Pad();
@@ -1471,9 +1496,11 @@ window.onload = function() {
         }
         for(var i=0;i<mapArraySize;i++){
             for(var j=0;j<mapArraySize;j++){
-                    array1[j][i]=33;
+                    array1[j][i]=-1;
             }
         }
+
+        scene.backgroundColor ="black";
 
         for(var i=7;i<13;i++){
             //床
@@ -1686,6 +1713,15 @@ window.onload = function() {
         stage.addChild(label);
         scene.addChild(stage);
 
+        //パッド見える用
+        var mask=new Label();
+        mask.height=100;
+        mask.width=100;
+        mask.x=mapScale-100;
+        mask.y=mapScale-200;
+        mask.backgroundColor='rgba(255,255,255,0.1)';
+        scene.addChild(mask);
+
         //パッド作成(いじらない)
         var pad = new Pad();
         pad.x = mapScale-100;
@@ -1779,6 +1815,7 @@ window.onload = function() {
                 player.isMoving=true;
             }else if(eventKind==4 && talkProgress == 4){
                 player.vy=0;
+                player.isMoving=false;
                 player.tick++;
                 if(player.tick==16){
                     buttonSound.play();
@@ -1962,9 +1999,11 @@ window.onload = function() {
         }
         for(var i=0;i<mapArraySize;i++){
             for(var j=0;j<mapArraySize;j++){
-                    array1[j][i]=33;
+                    array1[j][i]=-1;
             }
         }
+
+        scene.backgroundColor ="black";
 
         for(var i=7;i<19;i++){
             for(var j=7;j<15;j++){
@@ -2227,6 +2266,19 @@ window.onload = function() {
             player.direction=2;
             player.x = 7 * 16 - 8;
             player.y = 11 * 16;
+        }else if(previousScene==41){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=0;
+            if(previousCharaLocate==0){
+                player.x = 16 * 16 - 8;
+            }else{
+                player.x = 17 * 16 - 8;
+            }
+            player.y = 6 * 16;
+            bgm=true;
+            wholeSound.volume=0.1;
         }
 
         //マップ、キャラをグループ化して描画
@@ -2236,6 +2288,15 @@ window.onload = function() {
         stage.addChild(foregroundMap);
         stage.addChild(foregroundMap2);
         scene.addChild(stage);
+
+        //パッド見える用
+        var mask=new Label();
+        mask.height=100;
+        mask.width=100;
+        mask.x=mapScale-100;
+        mask.y=mapScale-200;
+        mask.backgroundColor='rgba(255,255,255,0.1)';
+        scene.addChild(mask);
 
         //パッド作成(いじらない)
         var pad = new Pad();
@@ -2254,6 +2315,7 @@ window.onload = function() {
 
             if(bgm==true){
                 wholeSound.play();
+                wholeSound.volume=0.1;
             }
 
             if(State==Nomal){
@@ -2435,6 +2497,2372 @@ window.onload = function() {
                             
                         }
                         break;
+                }
+            }
+        });
+        return scene;
+
+    };
+
+    game.makeScene4 = function(){
+        var scene = new Scene();
+        var wholeSound = game.assets['death.mp3'].clone();
+
+        scene.addEventListener('enterframe', function(e) {
+            if(previousScene==32　|| nextScene==41){
+                game.pushScene(game.makeScene4_1(wholeSound));
+            }else if(nextScene==42){
+                game.pushScene(game.makeScene4_2(wholeSound));
+            }else if(nextScene==43){
+                game.pushScene(game.makeScene4_3(wholeSound));
+            }else if(nextScene==44){
+                game.pushScene(game.makeScene4_4(wholeSound));
+            }else if(nextScene==45){
+                game.pushScene(game.makeScene4_5(wholeSound));
+            }else{
+                game.popScene();
+            }
+        });
+
+        return scene;
+    };
+
+    game.makeScene4_1 = function(wholeSound) {
+        var scene = new Scene();
+        var map = new Map(mapTileScale, mapTileScale);
+        var map2=new Map(mapTileScale, mapTileScale);
+        var foregroundMap2=new Map(mapTileScale, mapTileScale);
+        var foregroundMap=new Map(mapTileScale, mapTileScale);
+        map.image = game.assets['map1.gif'];
+        var runSound = game.assets['run.mp3'].clone();
+        var darkwholeSound = game.assets['makkuraOut.mp3'].clone();
+        var doleSound = game.assets['gusari.mp3'].clone();
+
+
+        //イベント判定用
+        var eventMap=new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            eventMap[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                eventMap[i][j]=-1;
+            }
+        }
+
+        eventMap[15][18]=1;
+        eventMap[14][18]=1;
+        eventMap[11][10]=2;
+        eventMap[10][10]=2;
+        eventMap[14][25]=3;
+        eventMap[15][25]=3;
+
+
+        //マップの背景作成
+        var array1 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array1[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                    array1[j][i]=-1;
+            }
+        }
+
+        scene.backgroundColor ="black";
+
+        for(var i=0;i<8;i++){
+            array1[26-i][15]=342;
+            array1[26-i][14]=342;
+            array1[26-i][13]=341;
+            array1[26-i][16]=341;
+        }
+
+        for(var i=0;i<4;i++){
+            for(var j=0;j<6;j++){
+                array1[15+i][12+j]=342;
+            }
+        }
+
+        array1[16][18]=342;
+        array1[17][18]=342;
+        array1[16][19]=342;
+        array1[17][19]=342;
+
+        for(var i=0;i<4;i++){
+            array1[14-i][15]=342;
+            array1[14-i][14]=342;
+        }
+
+        for(var i=0;i<4;i++){
+            array1[11][13-i]=342;
+            array1[12][13-i]=342;
+        }
+
+        for(var i=0;i<4;i++){
+            array1[11][13-i]=342;
+            array1[12][13-i]=342;
+        }
+
+        array1[10][10]=342;
+        array1[10][11]=342;
+
+
+        //マップの背景の上書き作成(アイテムなどの)
+        var array2 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array2[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array2[i][j]=-1;
+            }
+        }
+
+
+
+        //マップデータの作成
+        map.loadData(array1,array2);
+
+        //衝突判定作成
+        var array3 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array3[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array3[i][j]=0;
+            }
+        }
+
+        for(var i=0;i<8;i++){
+            array3[26-i][13]=1;
+            array3[26-i][16]=1;
+        }
+
+        array3[26][14]=1;
+        array3[26][15]=1;
+
+        array3[19][12]=1;
+        array3[19][17]=1;
+
+        array3[19][11]=1;
+        array3[19][18]=1;
+
+        array3[18][11]=1;
+        array3[18][18]=1;
+        array3[18][19]=1;
+        array3[18][20]=1;
+        array3[17][20]=1;
+        array3[16][20]=1;
+        array3[15][20]=1;
+        array3[15][19]=1;
+        array3[15][18]=1;
+        array3[14][18]=1;
+        array3[14][17]=1;
+        array3[14][16]=1;
+        array3[13][16]=1;
+        array3[12][16]=1;
+        array3[11][16]=1;
+        array3[10][16]=1;
+        array3[10][15]=1;
+        array3[10][14]=1;
+        array3[10][13]=1;
+        array3[10][12]=1;
+        array3[9][12]=1;
+        array3[9][11]=1;
+        array3[9][10]=1;
+        array3[9][9]=1;
+        array3[10][9]=1;
+        array3[11][9]=1;
+        array3[12][9]=1;
+        array3[13][9]=1;
+        array3[13][10]=1;
+        array3[13][11]=1;
+        array3[13][12]=1;
+        array3[13][13]=1;
+        array3[14][13]=1;
+        array3[14][12]=1;
+        array3[14][11]=1;
+        array3[13][11]=1;
+        array3[14][11]=1;
+        array3[15][11]=1;
+        array3[16][11]=1;
+        array3[17][11]=1;
+
+        //人形衝突判定
+        array3[16][14]=68;
+        array3[17][14]=78;
+        array3[16][15]=69;
+        array3[17][15]=79;
+
+        map.collisionData=array3;
+
+        //怖い系配置
+        map2.image=game.assets['nomen.png'];
+
+        var array4 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array4[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array4[i][j]=-1;
+            }
+        }
+
+        array4[9][13]=2;
+        array4[10][13]=12;
+        array4[9][14]=3;
+        array4[10][14]=13;
+
+        array4[16][18]=68;
+        array4[17][18]=78;
+        array4[16][19]=69;
+        array4[17][19]=79;
+
+        map2.loadData(array4);
+
+        //人形頭部用
+        foregroundMap.image=game.assets['nomen.png'];
+
+        var array5 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array5[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array5[i][j]=-1;
+            }
+        }
+
+        array5[15][18]=58;
+        array5[15][19]=59;
+
+        foregroundMap.loadData(array5);
+
+        //前のシーン鏡用
+        foregroundMap2.image = game.assets['makkuraEnterMirror.png'];
+
+        var array6 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array6[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array6[i][j]=-1;
+            }
+        }
+
+        array6[26][14]=2;
+        array6[26][15]=3;
+        foregroundMap2.loadData(array6);
+
+        //マップ移動分かりやすいよう作成
+        var label = new Label();
+        label.backgroundColor = "rgba(255,255,255,0.1)";
+        label.height=mapTileScale;
+        label.width=mapTileScale*2;
+        label.y=mapTileScale*10;
+        label.x=mapTileScale*10;
+
+        //プレイヤーデータ作成
+        var player = new Sprite(32, 32);
+        player.x = 20 * 16 - 8;
+        player.y = 25 * 16;
+        var image = new Surface(96, 128);
+        image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
+        player.image = image;
+
+        //プレイヤーの動き作成(いじらない)
+        player.isMoving = false;
+        player.direction = 0;
+        player.walk = 1;
+        player.addEventListener('enterframe', function() {
+
+            this.frame = this.direction * 3 + this.walk;
+            if (this.isMoving) {
+                this.moveBy(this.vx, this.vy);
+
+                if (!(game.frame % 3)) {
+                    this.walk++;
+                    this.walk %= 3;
+                }
+                if ((this.vx && (this.x-8) % 16 == 0) || (this.vy && this.y % 16 == 0)) {
+                    this.isMoving = false;
+                    this.walk = 1;
+                }
+            } else {
+                this.vx = this.vy = 0;
+                //イベント中は行動できない
+                if(State==Nomal){
+                    if (game.input.left) {
+                        this.direction = 1;
+                        this.vx = -4;
+                    } else if (game.input.right) {
+                        this.direction = 2;
+                        this.vx = 4;
+                    } else if (game.input.up) {
+                        this.direction = 3;
+                        this.vy = -4;
+                    } else if (game.input.down) {
+                        this.direction = 0;
+                        this.vy = 4;
+                    }
+                    if (this.vx || this.vy) {
+                        var x = this.x + (this.vx ? this.vx / Math.abs(this.vx) * 16 : 0) + 16;
+                        var y = this.y + (this.vy ? this.vy / Math.abs(this.vy) * 16 : 0) + 16;
+                        if (0 <= x && x < map.width && 0 <= y && y < map.height && !map.hitTest(x, y)) {
+                            this.isMoving = true;
+                            arguments.callee.call(this);
+                        }
+                    }
+                }
+            }
+        });
+
+        //マップ、キャラをグループ化して描画
+        var stage = new Group();
+        stage.addChild(map);
+        stage.addChild(map2);
+        stage.addChild(player);
+        stage.addChild(foregroundMap);
+        stage.addChild(foregroundMap2);
+        stage.addChild(label);
+        scene.addChild(stage);
+        
+
+        //パッド見える用
+        var mask=new Label();
+        mask.height=100;
+        mask.width=100;
+        mask.x=mapScale-100;
+        mask.y=mapScale-200;
+        mask.backgroundColor='rgba(255,255,255,0.1)';
+        scene.addChild(mask);
+
+        //パッド作成(いじらない)
+        var pad = new Pad();
+        pad.x = mapScale-100;
+        pad.y = mapScale-200;
+        scene.addChild(pad);
+
+        //前のシーンに応じてこのシーンの状態変更
+        if(previousScene==32){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=3;
+            player.x = 15 * 16 - 8;
+            player.y = 24 * 16;
+            bgm=true;
+        }else if(previousScene==42){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=0;
+            if(previousCharaLocate==0){
+                player.x = 10 * 16 - 8;
+            }else{
+                player.x = 11 * 16 - 8;
+            }
+            player.y = 9 * 16;
+            bgm=true;
+        }
+
+        player.tick=0;
+        scene.addEventListener('enterframe', function(e) {
+            var x = Math.min((game.width  - 16) / 2 - player.x, 0);
+            var y = Math.min((game.height - 16) / 2 - player.y, 0);
+            x = Math.max(game.width,  x + map.width)  - map.width;
+            y = Math.max(game.height, y + map.height) - map.height;
+            stage.x = x;
+            stage.y = y;
+
+            if(bgm==true){
+                wholeSound.play();
+                wholeSound.volume=0.05;
+            }else{
+                wholeSound.stop();
+            }
+
+            if(State==Nomal){
+                if(game.input.up && isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,2)){
+                    runSound.play();
+                    eventKind=2;
+                    State=GameEvent;
+                }else if(isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,1)){
+                    array4[16][18]=-1;
+                    array4[17][18]=-1;
+                    array4[16][19]=-1;
+                    array4[17][19]=-1;
+                    array5[15][18]=-1;
+                    array5[15][19]=-1;
+
+                    array4[16][14]=62;
+                    array4[17][14]=72;
+                    array4[16][15]=63;
+                    array4[17][15]=73;
+                    array5[15][14]=52;
+                    array5[15][15]=53;
+
+                    eventMap[15][18]=0;
+                    eventMap[14][18]=0;
+                    doleSound.play();
+
+                }else if(game.input.down && isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,3)){
+                    darkwholeSound.play();
+                    eventKind=3;
+                    State=GameEvent;
+                    bgm=false;
+                }
+            }
+
+            if(eventKind==2){
+                player.tick++;
+                if(player.tick==15){
+                    runSound.stop();
+                    nextScene=42;
+                    previousScene=41;
+                    game.popScene();
+                    if(playerToMapX(player.x)==10){
+                        previousCharaLocate=0;
+                    }else{
+                        previousCharaLocate=1;
+                    }
+                }
+            }else if(eventKind==3){
+                player.tick++;
+                if(player.tick==15){
+                    darkwholeSound.stop();
+                    nextScene=32;
+                    previousScene=41;
+                    nowScene=3;
+                    if(playerToMapX(player.x)==14){
+                        previousCharaLocate=0;
+                    }else{
+                        previousCharaLocate=1;
+                    }
+                    game.popScene();
+                }
+            }
+            
+
+
+        });
+
+        scene.addEventListener(Event.TOUCH_START , function(e) {
+
+            //パッド以外をタッチしたとき
+            if(touchJudge(e.x,e.y)){
+                switch(State){
+                    //イベント中でない時で、イベントが横にある状態で画面タッチすると
+                    case Nomal:
+                        //message=makeMessage(playerToMapX(player.x)+','+playerToMapY(player.y));
+                        //scene.addChild(message);
+                        break;
+                    case GameEvent:    //イベントの種類ごとの処理
+                        
+                        break;
+                }
+            }
+        });
+        return scene;
+
+    };
+
+    game.makeScene4_2 = function(wholeSound) {
+        var scene = new Scene();
+        var map = new Map(mapTileScale, mapTileScale);
+        var map2=new Map(mapTileScale, mapTileScale);
+        map.image = game.assets['map1.gif'];
+        map2.image = game.assets['nomen.png'];
+        var runSound = game.assets['run.mp3'].clone();
+
+
+        //イベント判定用
+        var eventMap=new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            eventMap[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                eventMap[i][j]=-1;
+            }
+        }
+
+        eventMap[6][12]=2;
+        eventMap[6][13]=2;
+        eventMap[10][21]=1;
+        eventMap[11][21]=1;
+
+
+        //マップの背景作成
+        var array1 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array1[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                    array1[j][i]=-1;
+            }
+        }
+
+        scene.backgroundColor ="black";
+
+        array1[20][10]=342;
+        array1[20][11]=342;
+        array1[21][10]=342;
+        array1[21][11]=342;
+
+
+        for(var i=0;i<12;i++){
+            array1[18][10+i]=342;
+            array1[19][10+i]=342;
+        }
+
+        for(var i=0;i<6;i++){
+            array1[17-i][20]=342;
+            array1[17-i][21]=342;
+        }
+
+        for(var i=0;i<14;i++){
+            array1[12][19-i]=342;
+            array1[13][19-i]=342;
+        }
+
+
+        //マップの背景の上書き作成(アイテムなどの)
+        var array2 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array2[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array2[i][j]=-1;
+            }
+        }
+
+
+
+        //マップデータの作成
+        map.loadData(array1,array2);
+
+        //衝突判定作成
+        var array3 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array3[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array3[i][j]=0;
+            }
+        }
+
+        array3[11][5]=1;
+        array3[12][5]=1;
+        array3[22][10]=1;
+        array3[22][11]=1;
+
+        array3[20][9]=1;
+        array3[20][2]=1;
+        array3[21][9]=1;
+        array3[21][2]=1;
+
+
+        array3[19][9]=1;
+        array3[18][9]=1;
+        array3[17][9]=1;
+        array3[17][10]=1;
+        array3[17][11]=1;
+        for(var i=0;i<8;i++){
+            array3[17][12+i]=1;
+            array3[20][12+i]=1;
+        }
+
+        for(var i=0;i<4;i++){
+            array3[17-i][19]=1;
+            array3[17-i][22]=1;
+        }
+        array3[13][22]=1;
+        array3[12][22]=1;
+        array3[11][22]=1;
+        array3[11][21]=1;
+        array3[11][20]=1;
+
+        for(var i=0;i<14;i++){
+            array3[11][19-i]=1;
+            array3[14][19-i]=1;
+        }
+
+        array3[13][5]=1;
+
+        map.collisionData=array3;
+
+        //お面
+        var array4 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array4[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array4[i][j]=-1;
+            }
+        }
+
+        array4[10][18]=0;
+        array4[10][19]=1;
+        array4[11][18]=10;
+        array4[11][19]=11;
+
+        map2.loadData(array4);
+
+        //マップ移動分かりやすいよう作成
+        var label = new Label();
+        label.backgroundColor = "rgba(255,255,255,0.1)";
+        label.height=mapTileScale*2;
+        label.width=mapTileScale;
+        label.y=mapTileScale*12;
+        label.x=mapTileScale*6;
+
+        //マップ移動分かりやすいよう2作成
+        var label2 = new Label();
+        label2.backgroundColor = "rgba(255,255,255,0.1)";
+        label2.height=mapTileScale;
+        label2.width=mapTileScale*2;
+        label2.y=mapTileScale*21;
+        label2.x=mapTileScale*10;
+
+        //プレイヤーデータ作成
+        var player = new Sprite(32, 32);
+        player.x = 20 * 16 - 8;
+        player.y = 25 * 16;
+        var image = new Surface(96, 128);
+        image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
+        player.image = image;
+
+        //プレイヤーの動き作成(いじらない)
+        player.isMoving = false;
+        player.direction = 0;
+        player.walk = 1;
+        player.addEventListener('enterframe', function() {
+
+            this.frame = this.direction * 3 + this.walk;
+            if (this.isMoving) {
+                this.moveBy(this.vx, this.vy);
+
+                if (!(game.frame % 3)) {
+                    this.walk++;
+                    this.walk %= 3;
+                }
+                if ((this.vx && (this.x-8) % 16 == 0) || (this.vy && this.y % 16 == 0)) {
+                    this.isMoving = false;
+                    this.walk = 1;
+                }
+            } else {
+                this.vx = this.vy = 0;
+                //イベント中は行動できない
+                if(State==Nomal){
+                    if (game.input.left) {
+                        this.direction = 1;
+                        this.vx = -4;
+                    } else if (game.input.right) {
+                        this.direction = 2;
+                        this.vx = 4;
+                    } else if (game.input.up) {
+                        this.direction = 3;
+                        this.vy = -4;
+                    } else if (game.input.down) {
+                        this.direction = 0;
+                        this.vy = 4;
+                    }
+                    if (this.vx || this.vy) {
+                        var x = this.x + (this.vx ? this.vx / Math.abs(this.vx) * 16 : 0) + 16;
+                        var y = this.y + (this.vy ? this.vy / Math.abs(this.vy) * 16 : 0) + 16;
+                        if (0 <= x && x < map.width && 0 <= y && y < map.height && !map.hitTest(x, y)) {
+                            this.isMoving = true;
+                            arguments.callee.call(this);
+                        }
+                    }
+                }
+            }
+        });
+
+        //マップ、キャラをグループ化して描画
+        var stage = new Group();
+        stage.addChild(map);
+        stage.addChild(map2);
+        stage.addChild(label);
+        stage.addChild(label2);
+        stage.addChild(player);
+        scene.addChild(stage);
+
+        //パッド見える用
+        var mask=new Label();
+        mask.height=100;
+        mask.width=100;
+        mask.x=mapScale-100;
+        mask.y=mapScale-200;
+        mask.backgroundColor='rgba(255,255,255,0.1)';
+        scene.addChild(mask);
+
+        //パッド作成(いじらない)
+        var pad = new Pad();
+        pad.x = mapScale-100;
+        pad.y = mapScale-200;
+        scene.addChild(pad);
+
+        //前のシーンに応じてこのシーンの状態変更
+        if(previousScene==41){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=3;
+            player.x = 10 * 16 - 8;
+            player.y = 20 * 16;
+            bgm=true;
+        }else if(previousScene==43){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=2;
+            player.x = 6 * 16 - 8;
+            if(previousCharaLocate==0){
+                player.y = 11 * 16;
+            }else{
+                player.y = 12 * 16;
+            }
+            bgm=true;
+        }
+
+        player.tick=0;
+        scene.addEventListener('enterframe', function(e) {
+            var x = Math.min((game.width  - 16) / 2 - player.x, 0);
+            var y = Math.min((game.height - 16) / 2 - player.y, 0);
+            x = Math.max(game.width,  x + map.width)  - map.width;
+            y = Math.max(game.height, y + map.height) - map.height;
+            stage.x = x;
+            stage.y = y;
+
+            if(bgm==true){
+                wholeSound.play();
+                wholeSound.volume=0.1;
+            }else{
+                wholeSound.stop();
+            }
+
+            if(State==Nomal){
+                if(game.input.down && isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,1)){
+                    runSound.play();
+                    eventKind=1;
+                    State=GameEvent;
+                }else if(game.input.left && isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,2)){
+                    runSound.play();
+                    eventKind=2;
+                    State=GameEvent;
+                }
+            }
+
+            if(eventKind==1){
+                player.tick++;
+                if(player.tick==15){
+                    runSound.stop();
+                    nextScene=41;
+                    previousScene=42;
+                    game.popScene();
+                    if(playerToMapX(player.x)==10){
+                        previousCharaLocate=0;
+                    }else{
+                        previousCharaLocate=1;
+                    }
+                }
+            }else if(eventKind==2){
+                player.tick++;
+                if(player.tick==15){
+                    runSound.stop();
+                    nextScene=43;
+                    previousScene=42;
+                    game.popScene();
+                    if(playerToMapY(player.y)==12){
+                        previousCharaLocate=0;
+                    }else{
+                        previousCharaLocate=1;
+                    }
+                }
+            }
+            
+
+
+        });
+
+        scene.addEventListener(Event.TOUCH_START , function(e) {
+
+            //パッド以外をタッチしたとき
+            if(touchJudge(e.x,e.y)){
+                switch(State){
+                    //イベント中でない時で、イベントが横にある状態で画面タッチすると
+                    case Nomal:
+                        message=makeMessage(playerToMapX(player.x)+','+playerToMapY(player.y));
+                        scene.addChild(message);
+                        break;
+                    case GameEvent:    //イベントの種類ごとの処理
+                        
+                        break;
+                }
+            }
+        });
+        return scene;
+
+    };
+
+    game.makeScene4_3 = function(wholeSound) {
+        var scene = new Scene();
+        var map = new Map(mapTileScale, mapTileScale);
+        var map2=new Map(mapTileScale, mapTileScale);
+        map.image = game.assets['map1.gif'];
+        map2.image = game.assets['nomen.png'];
+        var runSound = game.assets['run.mp3'].clone();
+        var buttonSound = game.assets['musmus_btn_set\\btn01.mp3'].clone();
+
+
+        //イベント判定用
+        var eventMap=new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            eventMap[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                eventMap[i][j]=-1;
+            }
+        }
+
+        eventMap[22][10]=1;
+        eventMap[22][11]=1;
+        eventMap[16][17]=2;
+        eventMap[15][17]=2;
+
+        //マップの背景作成
+        var array1 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array1[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                    array1[j][i]=-1;
+            }
+        }
+
+        scene.backgroundColor ="black";
+
+        for(var i=0;i<8;i++){
+            for(var j=0;j<2;j++){
+                array1[j+10][i+15]=342;
+            }
+        }
+
+        for(var i=0;i<2;i++){
+            for(var j=0;j<6;j++){
+                array1[j+12][i+15]=342;
+            }
+        }
+
+        for(var i=0;i<3;i++){
+            for(var j=0;j<3;j++){
+                array1[j+10][i]=342;
+            }
+        }
+
+        array1[10][3]=342;
+        array1[11][3]=342;
+        array1[10][4]=342;
+        array1[11][4]=342;
+
+
+        //マップの背景の上書き作成(アイテムなどの)
+        var array2 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array2[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array2[i][j]=-1;
+            }
+        }
+
+        //マップデータの作成
+        map.loadData(array1,array2);
+
+        //衝突判定作成
+        var array3 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array3[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array3[i][j]=0;
+            }
+        }
+
+        array3[10][23]=1;
+        array3[11][23]=1;
+        array3[18][15]=1;
+        array3[18][16]=1;
+
+        array3[9][15]=1;
+        array3[9][16]=1;
+        for(var i=0;i<6;i++){
+            array3[9][i+17]=1;
+            array3[12][i+17]=1;
+        }
+
+        for(var i=0;i<12;i++){
+            array3[9][i+3]=1;
+            array3[12][i+3]=1;
+        }
+
+        for(var i=0;i<3;i++){
+            array3[9][i]=1;
+            array3[13][i]=1;
+        }
+
+        for(var j=0;j<6;j++){
+            array3[j+12][14]=1;
+            array3[j+12][17]=1;
+        }
+
+        map.collisionData=array3;
+
+        //お面
+        var array4 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array4[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array4[i][j]=-1;
+            }
+        }
+
+        array4[8][18]=4;
+        array4[8][19]=5;
+        array4[9][18]=14;
+        array4[9][19]=15;
+
+        map2.loadData(array4);
+
+        //アイテム「リコーダー」用
+        if(itemList[0]==0){
+            eventMap[1][11]=3;
+            array3[11][1]=1;
+            array2[11][1]=420;
+        }
+
+        //マップ移動分かりやすいよう作成
+        var label = new Label();
+        label.backgroundColor = "rgba(255,255,255,0.1)";
+        label.height=mapTileScale*2;
+        label.width=mapTileScale;
+        label.y=mapTileScale*10;
+        label.x=mapTileScale*22;
+
+        //マップ移動分かりやすいよう2作成
+        var label2 = new Label();
+        label2.backgroundColor = "rgba(255,255,255,0.1)";
+        label2.height=mapTileScale;
+        label2.width=mapTileScale*2;
+        label2.y=mapTileScale*17;
+        label2.x=mapTileScale*15;
+
+        //暗闇マスク作成
+        var label3 = new Label();
+        label3.backgroundColor = "rgba(0,0,0,1)";
+        label3.height=mapTileScale*4;
+        label3.width=mapTileScale*10;
+        label3.y=mapTileScale*9;
+        label3.x=mapTileScale*5;
+
+        //マップ移動分かりやすいよう3作成
+        var label4 = new Label();
+        label4.backgroundColor = "rgba(255,255,255,0.1)";
+        label4.height=mapTileScale*2;
+        label4.width=mapTileScale;
+        label4.y=mapTileScale*10;
+        label4.x=mapTileScale*15;
+
+        //マップ移動分かりやすいよう4作成
+        var label5 = new Label();
+        label5.backgroundColor = "rgba(255,255,255,0.1)";
+        label5.height=mapTileScale*2;
+        label5.width=mapTileScale;
+        label5.y=mapTileScale*10;
+        label5.x=mapTileScale*4;
+
+        //プレイヤーデータ作成
+        var player = new Sprite(32, 32);
+        player.x = 20 * 16 - 8;
+        player.y = 25 * 16;
+        var image = new Surface(96, 128);
+        image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
+        player.image = image;
+
+        //プレイヤーの動き作成(いじらない)
+        player.isMoving = false;
+        player.direction = 0;
+        player.walk = 1;
+        player.addEventListener('enterframe', function() {
+
+            this.frame = this.direction * 3 + this.walk;
+            if (this.isMoving) {
+                this.moveBy(this.vx, this.vy);
+
+                if (!(game.frame % 3)) {
+                    this.walk++;
+                    this.walk %= 3;
+                }
+                if ((this.vx && (this.x-8) % 16 == 0) || (this.vy && this.y % 16 == 0)) {
+                    this.isMoving = false;
+                    this.walk = 1;
+                }
+            } else {
+                this.vx = this.vy = 0;
+                //イベント中は行動できない
+                if(State==Nomal){
+                    if (game.input.left) {
+                        this.direction = 1;
+                        this.vx = -4;
+                    } else if (game.input.right) {
+                        this.direction = 2;
+                        this.vx = 4;
+                    } else if (game.input.up) {
+                        this.direction = 3;
+                        this.vy = -4;
+                    } else if (game.input.down) {
+                        this.direction = 0;
+                        this.vy = 4;
+                    }
+                    if (this.vx || this.vy) {
+                        var x = this.x + (this.vx ? this.vx / Math.abs(this.vx) * 16 : 0) + 16;
+                        var y = this.y + (this.vy ? this.vy / Math.abs(this.vy) * 16 : 0) + 16;
+                        if (0 <= x && x < map.width && 0 <= y && y < map.height && !map.hitTest(x, y)) {
+                            this.isMoving = true;
+                            arguments.callee.call(this);
+                        }
+                    }
+                }
+            }
+        });
+
+        //マップ、キャラをグループ化して描画
+        var stage = new Group();
+        stage.addChild(map);
+        stage.addChild(map2);
+        stage.addChild(label);
+        stage.addChild(label2);
+        stage.addChild(label4);
+        stage.addChild(label5);
+        stage.addChild(player);
+        stage.addChild(label3);
+        scene.addChild(stage);
+
+        //パッド見える用
+        var mask=new Label();
+        mask.height=100;
+        mask.width=100;
+        mask.x=mapScale-100;
+        mask.y=mapScale-200;
+        mask.backgroundColor='rgba(255,255,255,0.1)';
+        scene.addChild(mask);
+
+        //パッド作成(いじらない)
+        var pad = new Pad();
+        pad.x = mapScale-100;
+        pad.y = mapScale-200;
+        scene.addChild(pad);
+
+        //前のシーンに応じてこのシーンの状態変更
+        if(previousScene==42){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=1;
+            player.x = 22 * 16 - 8;
+            if(previousCharaLocate==0){
+                player.y = 9 * 16;
+            }else{
+                player.y = 10 * 16;
+            }
+            bgm=true;
+        }else if(previousScene==44){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=3;
+            if(previousCharaLocate==0){
+                player.x = 15 * 16 - 8;
+            }else{
+                player.x = 16 * 16 - 8;
+            }
+            player.y = 16 * 16;
+            bgm=true;
+        }
+
+        player.tick=0;
+        scene.addEventListener('enterframe', function(e) {
+            var x = Math.min((game.width  - 16) / 2 - player.x, 0);
+            var y = Math.min((game.height - 16) / 2 - player.y, 0);
+            x = Math.max(game.width,  x + map.width)  - map.width;
+            y = Math.max(game.height, y + map.height) - map.height;
+            stage.x = x;
+            stage.y = y;
+
+            if(bgm==true){
+                wholeSound.play();
+                wholeSound.volume=0.1;
+            }else{
+                wholeSound.stop();
+            }
+
+            if(State==Nomal){
+                if(game.input.right && isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,1)){
+                    runSound.play();
+                    eventKind=1;
+                    State=GameEvent;
+                }else if(game.input.down && isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,2)){
+                    runSound.play();
+                    eventKind=2;
+                    State=GameEvent;
+                }
+            }
+
+            if(eventKind==1){
+                player.tick++;
+                if(player.tick==15){
+                    runSound.stop();
+                    nextScene=42;
+                    previousScene=43;
+                    if(playerToMapY(player.y)==10){
+                        previousCharaLocate=0;
+                    }else{
+                        previousCharaLocate=1;
+                    }
+                    game.popScene();
+                }
+            }else if(eventKind==2){
+                player.tick++;
+                if(player.tick==15){
+                    runSound.stop();
+                    nextScene=44;
+                    previousScene=43;
+                    if(playerToMapX(player.x)==15){
+                        previousCharaLocate=0;
+                    }else{
+                        previousCharaLocate=1;
+                    }
+                    game.popScene();
+                }
+            }
+            
+
+
+        });
+
+        scene.addEventListener(Event.TOUCH_START , function(e) {
+
+            //パッド以外をタッチしたとき
+            if(touchJudge(e.x,e.y)){
+                switch(State){
+                    //イベント中でない時で、イベントが横にある状態で画面タッチすると
+                    case Nomal:
+                        if(isSurroundEvent(playerToMapX(player.x),playerToMapY(player.y),player.direction,eventMap,3)){
+                            buttonSound.play();
+                            message=makeMessage('アイテム「リコーダー」を手に入れた');
+                            scene.addChild(message);
+                            eventKind=3;
+                            State=GameEvent;
+                        }else{
+                            //message=makeMessage(playerToMapX(player.x)+','+playerToMapY(player.y));
+                            //scene.addChild(message);
+                        }
+                        break;
+                    case GameEvent:    //イベントの種類ごとの処理
+                        switch(eventKind){
+                            case 3:
+                                scene.removeChild(message);
+                                State=Nomal;
+                                eventKind=0;
+                                eventMap[1][11]=0;
+                                array2[11][1]=-1;
+                                map.loadData(array1,array2);
+                                array3[11][1]=0;
+                                itemList[0]=1;
+                                break;
+                        }
+                        break;
+                }
+            }
+        });
+        return scene;
+
+    };
+
+    game.makeScene4_4 = function(wholeSound) {
+        var scene = new Scene();
+        var map = new Map(mapTileScale, mapTileScale);
+        var map2=new Map(mapTileScale, mapTileScale);
+        map.image = game.assets['map1.gif'];
+        map2.image = game.assets['nomen.png'];
+        var runSound = game.assets['run.mp3'].clone();
+        var buttonSound = game.assets['musmus_btn_set\\btn01.mp3'].clone();
+        var doleSound = game.assets['gusari.mp3'].clone();
+
+        //イベント判定用
+        var eventMap=new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            eventMap[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                eventMap[i][j]=-1;
+            }
+        }
+
+        eventMap[20][6]=1;
+        eventMap[21][6]=1;
+        eventMap[7][6]=2;
+        eventMap[8][6]=2;
+        eventMap[20][17]=4;
+        eventMap[21][17]=4;
+
+        //マップの背景作成
+        var array1 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array1[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                    array1[j][i]=-1;
+            }
+        }
+
+        scene.backgroundColor ="black";
+
+        for(var i=0;i<2;i++){
+            for(var j=0;j<4;j++){
+                array1[j+6][i+20]=342;
+            }
+        }
+
+        for(var i=0;i<4;i++){
+            for(var j=0;j<4;j++){
+                array1[j+10][i+19]=342;
+            }
+        }
+
+        for(var i=0;i<3;i++){
+            for(var j=0;j<2;j++){
+                array1[j+11][i+23]=342;
+            }
+        }
+
+        for(var i=0;i<2;i++){
+            for(var j=0;j<6;j++){
+                array1[j+14][i+20]=342;
+            }
+        }
+
+        for(var i=0;i<13;i++){
+            for(var j=0;j<2;j++){
+                array1[j+20][i+9]=342;
+            }
+        }
+
+        for(var i=0;i<13;i++){
+            for(var j=0;j<2;j++){
+                array1[j+11][i+9]=342;
+            }
+        }
+
+        for(var i=0;i<2;i++){
+            for(var j=0;j<16;j++){
+                array1[j+6][i+7]=342;
+            }
+        }
+
+
+        //マップの背景の上書き作成(アイテムなどの)
+        var array2 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array2[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array2[i][j]=-1;
+            }
+        }
+
+        //マップデータの作成
+        map.loadData(array1,array2);
+
+        //衝突判定作成
+        var array3 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array3[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array3[i][j]=0;
+            }
+        }
+
+        for(var i=0;i<4;i++){
+            array3[6+i][19]=1;
+            array3[6+i][22]=1;
+        }
+
+        for(var i=0;i<3;i++){
+            array3[10][23+i]=1;
+            array3[13][23+i]=1;
+        }
+
+        array3[11][26]=1;
+        array3[12][26]=1;
+        array3[13][18]=1;
+
+        for(var i=0;i<6;i++){
+            array3[14+i][19]=1;
+            array3[14+i][22]=1;
+        }
+
+        array3[20][22]=1;
+        array3[21][22]=1;
+        array3[22][21]=1;
+        array3[22][20]=1;
+
+        for(var i=0;i<11;i++){
+            array3[19][19-i]=1;
+            array3[22][19-i]=1;
+        }
+
+        for(var i=0;i<10;i++){
+            array3[10][18-i]=1;
+            array3[13][18-i]=1;
+        }
+
+        array3[20][6]=1;
+        array3[21][6]=1;
+        array3[22][7]=1;
+        array3[22][8]=1;
+
+        for(var i=0;i<5;i++){
+            array3[6+i][6]=1;
+            array3[6+i][9]=1;
+        }
+
+        array3[11][6]=1;
+        array3[12][6]=1;
+
+        for(var i=0;i<7;i++){
+            array3[13+i][6]=1;
+            array3[13+i][9]=1;
+        }
+
+        array3[5][20]=1;
+        array3[5][21]=1;
+        array3[5][7]=1;
+        array3[5][8]=1;
+
+        //人形衝突判定
+        array3[11][23]=1;
+        array3[12][23]=1;
+
+        map.collisionData=array3;
+
+        //お面たち用
+        var array4 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array4[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array4[i][j]=-1;
+            }
+        }
+
+        //人形
+        array4[10][23]=98;
+        array4[10][24]=99;
+        array4[11][23]=108;
+        array4[11][24]=109;
+        array4[12][23]=118;
+        array4[12][24]=119;
+
+        //鬼の面
+        for(var i=0;i<6;i++){
+            array4[9][9+i]=i;
+            array4[10][9+i]=10+i;
+        }
+        for(var i=0;i<4;i++){
+            array4[9][15+i]=20+i;
+            array4[10][15+i]=30+i;
+        }
+
+        map2.loadData(array4);
+
+        //アイテム「なふだ」用
+        if(itemList[1]==0){
+            eventMap[25][12]=3;
+            array3[12][25]=1;
+            array2[12][25]=420;
+        }
+
+        //マップ移動分かりやすいよう作成
+        var label = new Label();
+        label.backgroundColor = "rgba(255,255,255,0.1)";
+        label.height=mapTileScale;
+        label.width=mapTileScale*2;
+        label.y=mapTileScale*6;
+        label.x=mapTileScale*20;
+
+        //マップ移動分かりやすいよう2作成
+        var label2 = new Label();
+        label2.backgroundColor = "rgba(255,255,255,0.1)";
+        label2.height=mapTileScale;
+        label2.width=mapTileScale*2;
+        label2.y=mapTileScale*6;
+        label2.x=mapTileScale*7;
+
+        //プレイヤーデータ作成
+        var player = new Sprite(32, 32);
+        player.x = 20 * 16 - 8;
+        player.y = 25 * 16;
+        var image = new Surface(96, 128);
+        image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
+        player.image = image;
+
+        //プレイヤーの動き作成(いじらない)
+        player.isMoving = false;
+        player.direction = 0;
+        player.walk = 1;
+        player.addEventListener('enterframe', function() {
+
+            this.frame = this.direction * 3 + this.walk;
+            if (this.isMoving) {
+                this.moveBy(this.vx, this.vy);
+
+                if (!(game.frame % 3)) {
+                    this.walk++;
+                    this.walk %= 3;
+                }
+                if ((this.vx && (this.x-8) % 16 == 0) || (this.vy && this.y % 16 == 0)) {
+                    this.isMoving = false;
+                    this.walk = 1;
+                }
+            } else {
+                this.vx = this.vy = 0;
+                //イベント中は行動できない
+                if(State==Nomal){
+                    if (game.input.left) {
+                        this.direction = 1;
+                        this.vx = -4;
+                    } else if (game.input.right) {
+                        this.direction = 2;
+                        this.vx = 4;
+                    } else if (game.input.up) {
+                        this.direction = 3;
+                        this.vy = -4;
+                    } else if (game.input.down) {
+                        this.direction = 0;
+                        this.vy = 4;
+                    }
+                    if (this.vx || this.vy) {
+                        var x = this.x + (this.vx ? this.vx / Math.abs(this.vx) * 16 : 0) + 16;
+                        var y = this.y + (this.vy ? this.vy / Math.abs(this.vy) * 16 : 0) + 16;
+                        if (0 <= x && x < map.width && 0 <= y && y < map.height && !map.hitTest(x, y)) {
+                            this.isMoving = true;
+                            arguments.callee.call(this);
+                        }
+                    }
+                }
+            }
+        });
+
+        //マップ、キャラをグループ化して描画
+        var stage = new Group();
+        stage.addChild(map);
+        stage.addChild(map2);
+        stage.addChild(label);
+        stage.addChild(label2);
+        stage.addChild(player);
+        scene.addChild(stage);
+
+        //パッド見える用
+        var mask=new Label();
+        mask.height=100;
+        mask.width=100;
+        mask.x=mapScale-100;
+        mask.y=mapScale-200;
+        mask.backgroundColor='rgba(255,255,255,0.1)';
+        scene.addChild(mask);
+
+        //パッド作成(いじらない)
+        var pad = new Pad();
+        pad.x = mapScale-100;
+        pad.y = mapScale-200;
+        scene.addChild(pad);
+
+        //前のシーンに応じてこのシーンの状態変更
+        if(previousScene==43){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=0;
+            if(previousCharaLocate==0){
+                player.x = 20 * 16 - 8;
+            }else{
+                player.x = 21 * 16 - 8;
+            }
+            player.y = 5 * 16;
+            bgm=true;
+        }else if(previousScene==45){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=0;
+            if(previousCharaLocate==0){
+                player.x = 7 * 16 - 8;
+            }else{
+                player.x = 8 * 16 - 8;
+            }
+            player.y = 5 * 16;
+            bgm=true;
+        }
+
+        player.tick=0;
+        scene.addEventListener('enterframe', function(e) {
+            var x = Math.min((game.width  - 16) / 2 - player.x, 0);
+            var y = Math.min((game.height - 16) / 2 - player.y, 0);
+            x = Math.max(game.width,  x + map.width)  - map.width;
+            y = Math.max(game.height, y + map.height) - map.height;
+            stage.x = x;
+            stage.y = y;
+
+            if(bgm==true){
+                wholeSound.play();
+                wholeSound.volume=0.1;
+            }else{
+                wholeSound.stop();
+            }
+
+            if(State==Nomal){
+                if(game.input.up && isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,1)){
+                    runSound.play();
+                    eventKind=1;
+                    State=GameEvent;
+                }else if(game.input.up && isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,2)){
+                    runSound.play();
+                    eventKind=2;
+                    State=GameEvent;
+                }else if(isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,4)){
+                    doleSound.play();
+                    
+                    array4[10][23]=-1;
+                    array4[10][24]=-1;
+                    array4[11][23]=-1;
+                    array4[11][24]=-1;
+                    array4[12][23]=-1;
+                    array4[12][24]=-1;
+
+                    array3[11][23]=0;
+                    array3[12][23]=0;
+
+                    array4[14][20]=92;
+                    array4[14][21]=93;
+                    array4[15][20]=102;
+                    array4[15][21]=103;
+                    array4[16][20]=112;
+                    array4[16][21]=113;
+
+                    array3[14][20]=1;
+                    array3[14][21]=1;
+                    array3[16][20]=1;
+                    array3[16][21]=1;
+
+                    eventMap[20][17]=0;
+                    eventMap[21][17]=0;
+
+                }
+            }
+
+            if(eventKind==1){
+                player.tick++;
+                if(player.tick==15){
+                    runSound.stop();
+                    nextScene=43;
+                    previousScene=44;
+                    if(playerToMapX(player.x)==20){
+                        previousCharaLocate=0;
+                    }else{
+                        previousCharaLocate=1;
+                    }
+                    game.popScene();
+                }
+            }else if(eventKind==2){
+                player.tick++;
+                if(player.tick==15){
+                    runSound.stop();
+                    nextScene=45;
+                    previousScene=44;
+                    if(playerToMapX(player.x)==7){
+                        previousCharaLocate=0;
+                    }else{
+                        previousCharaLocate=1;
+                    }
+                    game.popScene();
+                }
+            }
+            
+
+
+        });
+
+        scene.addEventListener(Event.TOUCH_START , function(e) {
+
+            //パッド以外をタッチしたとき
+            if(touchJudge(e.x,e.y)){
+                switch(State){
+                    //イベント中でない時で、イベントが横にある状態で画面タッチすると
+                    case Nomal:
+                        if(isSurroundEvent(playerToMapX(player.x),playerToMapY(player.y),player.direction,eventMap,3)){
+                            buttonSound.play();
+                            message=makeMessage('アイテム「なふだ」を手に入れた');
+                            scene.addChild(message);
+                            eventKind=3;
+                            State=GameEvent;
+                        }else{
+                            //message=makeMessage(playerToMapX(player.x)+','+playerToMapY(player.y));
+                            //scene.addChild(message);
+                        }
+                        break;
+                    case GameEvent:    //イベントの種類ごとの処理
+                        switch(eventKind){
+                            case 3:
+                                scene.removeChild(message);
+                                State=Nomal;
+                                eventKind=0;
+                                eventMap[25][12]=0;
+                                array2[12][25]=-1;
+                                map.loadData(array1,array2);
+                                array3[12][25]=0;
+                                itemList[1]=1;
+                                break;
+                        }
+                        break;
+                }
+            }
+        });
+        return scene;
+
+    };
+
+    game.makeScene4_5 = function(wholeSound) {
+        var scene = new Scene();
+        var map = new Map(mapTileScale, mapTileScale);
+        var map2=new Map(mapTileScale, mapTileScale);
+        var map3=new Map(mapTileScale, mapTileScale);
+        map.image = game.assets['map1.gif'];
+        map2.image = game.assets['heya_girl2.png'];
+        map3.image = game.assets['heya_girl2.png'];
+        var runSound = game.assets['run.mp3'].clone();
+        var buttonSound = game.assets['musmus_btn_set\\btn01.mp3'].clone();
+        var musicSound = game.assets['music.mp3'].clone();
+        var darkwholeSound = game.assets['makkuraOut.mp3'].clone();
+        var selectMessage1=selectMessage('はい',1);
+        var selectMessage2=selectMessage('いいえ',2);
+
+
+        //イベント判定用
+        var eventMap=new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            eventMap[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                eventMap[i][j]=-1;
+            }
+        }
+
+        eventMap[14][14]=3;
+        eventMap[15][14]=3;
+        eventMap[14][19]=1;
+        eventMap[15][19]=1;
+        eventMap[14][13]=2;
+        eventMap[15][13]=2;
+
+
+        //マップの背景作成
+        var array1 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array1[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                    array1[j][i]=-1;
+            }
+        }
+
+        scene.backgroundColor ="black";
+
+        for(var i=0;i<10;i++){
+            for(var j=0;j<10;j++){
+                array1[j+10][i+10]=342;
+            }
+        }
+
+
+        //マップの背景の上書き作成(アイテムなどの)
+        var array2 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array2[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array2[i][j]=-1;
+            }
+        }
+
+
+
+        //マップデータの作成
+        map.loadData(array1,array2);
+
+        //衝突判定作成
+        var array3 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array3[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array3[i][j]=0;
+            }
+        }
+
+        for(var i=0;i<11;i++){
+            array3[9+i][9]=1;
+            array3[9][9+i]=1;
+            array3[20][9+i]=1;
+            array3[9+i][20]=1;
+        }
+
+        array3[14][14]=1;
+        array3[14][15]=1;
+        array3[13][14]=1;
+        array3[13][15]=1;
+
+        map.collisionData=array3;
+
+        var array4 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array4[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array4[i][j]=-1;
+            }
+        }
+
+        array4[10][14]=58*16+2;
+        array4[10][15]=58*16+3;
+        array4[11][14]=59*16+2;
+        array4[11][15]=59*16+3;
+        array4[12][14]=60*16+2;
+        array4[12][15]=60*16+3;
+
+        map2.loadData(array4);
+
+        var array5 = new Array(mapArraySize);
+        for(var i=0;i<mapArraySize;i++){
+            array5[i]=new Array(mapArraySize);
+        }
+        for(var i=0;i<mapArraySize;i++){
+            for(var j=0;j<mapArraySize;j++){
+                array5[i][j]=-1;
+            }
+        }
+
+        array5[13][14]=61*16+2;
+        array5[13][15]=61*16+3;
+
+        map3.loadData(array5);
+
+        //マップ移動分かりやすいよう作成
+        var label = new Label();
+        label.backgroundColor = "rgba(255,255,255,0.1)";
+        label.height=mapTileScale;
+        label.width=mapTileScale*2;
+        label.y=mapTileScale*19;
+        label.x=mapTileScale*14;
+
+        //プレイヤーデータ作成
+        var player = new Sprite(32, 32);
+        player.x = 20 * 16 - 8;
+        player.y = 25 * 16;
+        var image = new Surface(96, 128);
+        image.draw(game.assets['chara0.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
+        player.image = image;
+
+        //プレイヤーの動き作成(いじらない)
+        player.isMoving = false;
+        player.direction = 0;
+        player.walk = 1;
+        player.addEventListener('enterframe', function() {
+
+            this.frame = this.direction * 3 + this.walk;
+            if (this.isMoving) {
+                this.moveBy(this.vx, this.vy);
+
+                if (!(game.frame % 3)) {
+                    this.walk++;
+                    this.walk %= 3;
+                }
+                if ((this.vx && (this.x-8) % 16 == 0) || (this.vy && this.y % 16 == 0)) {
+                    this.isMoving = false;
+                    this.walk = 1;
+                }
+            } else {
+                this.vx = this.vy = 0;
+                //イベント中は行動できない
+                if(State==Nomal){
+                    if (game.input.left) {
+                        this.direction = 1;
+                        this.vx = -4;
+                    } else if (game.input.right) {
+                        this.direction = 2;
+                        this.vx = 4;
+                    } else if (game.input.up) {
+                        this.direction = 3;
+                        this.vy = -4;
+                    } else if (game.input.down) {
+                        this.direction = 0;
+                        this.vy = 4;
+                    }
+                    if (this.vx || this.vy) {
+                        var x = this.x + (this.vx ? this.vx / Math.abs(this.vx) * 16 : 0) + 16;
+                        var y = this.y + (this.vy ? this.vy / Math.abs(this.vy) * 16 : 0) + 16;
+                        if (0 <= x && x < map.width && 0 <= y && y < map.height && !map.hitTest(x, y)) {
+                            this.isMoving = true;
+                            arguments.callee.call(this);
+                        }
+                    }
+                }
+            }
+        });
+
+        //くろくろ作成
+        var player2 = new Sprite(32, 32);
+        player2.x = 14 * 16;
+        player2.y = 13 * 16;
+        var image = new Surface(96, 128);
+        image.draw(game.assets['chara.gif'], 32*6, 0, 96, 128, 0, 0, 96, 128);
+        player2.image = image;
+        player2.scaleX=2;
+
+        //くろくろ作成(いじらない)
+        player2.isMoving = false;
+        player2.direction = 0;
+        player2.walk = 1;
+        player2.addEventListener('enterframe', function() {
+            if(bgm==true) wholeSound.play();
+
+            this.frame = this.direction * 3 + this.walk;
+            if (this.isMoving) {
+                this.moveBy(this.vx, this.vy);
+
+                if (!(game.frame % 3)) {
+                    this.walk++;
+                    this.walk %= 3;
+                }
+                if ((this.vx && (this.x-8) % 16 == 0) || (this.vy && this.y % 16 == 0)) {
+                    this.isMoving = false;
+                    this.walk = 1;
+                }
+            } else {
+                this.vx = this.vy = 0;
+                
+            }
+        });
+
+        //マップ、キャラをグループ化して描画
+        var stage = new Group();
+        stage.addChild(map);
+        stage.addChild(map3);
+        stage.addChild(label);
+        stage.addChild(player2);
+        stage.addChild(player);
+        stage.addChild(map2);
+        scene.addChild(stage);
+
+        //パッド見える用
+        var mask=new Label();
+        mask.height=100;
+        mask.width=100;
+        mask.x=mapScale-100;
+        mask.y=mapScale-200;
+        mask.backgroundColor='rgba(255,255,255,0.1)';
+        scene.addChild(mask);
+
+        //パッド作成(いじらない)
+        var pad = new Pad();
+        pad.x = mapScale-100;
+        pad.y = mapScale-200;
+        scene.addChild(pad);
+
+        //前のシーンに応じてこのシーンの状態変更
+        if(previousScene==44){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=3;
+            if(previousCharaLocate==0){
+                player.x = 14 * 16 - 8;
+            }else{
+                player.x = 15 * 16 - 8;
+            }
+            player.y = 18 * 16;
+            if(itemList[2]==0){
+                eventKind=4;
+                State=GameEvent;
+                bgm=false;
+            }else{
+                bgm=true;
+            }
+        }else if(previousScene==51){
+            State=Nomal;
+            eventKind=0;
+            talkProgress=0;
+            player.direction=0;
+            if(previousCharaLocate==0){
+                player.x = 14 * 16 - 8;
+            }else{
+                player.x = 15 * 16 - 8;
+            }
+            player.y = 12 * 16;
+            bgm=true;
+        }
+
+        player.tick=0;
+        scene.addEventListener('enterframe', function(e) {
+            var x = Math.min((game.width  - 16) / 2 - player.x, 0);
+            var y = Math.min((game.height - 16) / 2 - player.y, 0);
+            x = Math.max(game.width,  x + map.width)  - map.width;
+            y = Math.max(game.height, y + map.height) - map.height;
+            stage.x = x;
+            stage.y = y;
+
+            if(bgm==true){
+                wholeSound.play();
+                wholeSound.volume=0.1;
+            }else{
+                wholeSound.stop();
+            }
+
+            if(State==Nomal){
+                if(game.input.down && isEventHere(playerToMapX(player.x),playerToMapY(player.y),eventMap,1)){
+                    runSound.play();
+                    eventKind=1;
+                    State=GameEvent;
+                }
+            }
+
+            if(eventKind==1){
+                player.tick++;
+                if(player.tick==15){
+                    runSound.stop();
+                    nextScene=44;
+                    previousScene=45;
+                    game.popScene();
+                    if(playerToMapX(player.x)==14){
+                        previousCharaLocate=0;
+                    }else{
+                        previousCharaLocate=1;
+                    }
+                }
+            }else if(eventKind==4){
+                if(talkProgress==0){
+                    player.tick++;
+                    if(player.tick==10){
+                        player.tick=0;
+                        talkProgress++;
+                    }
+                }else if(talkProgress==1){
+                    buttonSound.play();
+                    message=makeMessage("ミラ「あ！　鏡あった！」");
+                    scene.addChild(message);
+                    talkProgress++;
+                }else if(talkProgress==5 && playerToMapY(player.y)!=15){
+                    player.vx = 0;
+                    player.direction = 3;
+                    player.vy = -4;
+                    player.isMoving=true;
+                }else if(talkProgress == 5){
+                    player.vy=0;
+                    player.isMoving=false;
+                    talkProgress++;
+
+                    player.tick=0;
+                }else if(talkProgress==6){
+                    player.tick++;
+                    if(player.tick==10){
+                        player.tick=0;
+                        talkProgress++;
+                    }
+                }else if(talkProgress==7){
+                    buttonSound.play();
+                    message=makeMessage("？？？「ケケ....ケケケ.....」");
+                    scene.addChild(message);
+                    talkProgress++;
+                }
+            }else if(eventKind==5){
+                if(talkProgress==1){
+                    scene.removeChild(message);
+                    musicSound.play();
+                    talkProgress++;
+                }else if(talkProgress==2){
+                    player.tick++;
+                    if(player.tick==75){
+                        player.tick=0;
+                        buttonSound.play();
+                        message=makeMessage('ミラ「わたしだってれんしゅうしたんだよーだ！」');
+                        scene.addChild(message);
+                        talkProgress++;
+                    }
+                }else if(talkProgress==5){
+                    player.tick++;
+                    if(player.tick==30){
+                        player.tick=0;
+                        talkProgress++;
+                    }
+                }else if(talkProgress==6){
+                    scene.removeChild(message);
+                    message=screenDark(1);
+                    scene.addChild(message);
+                    talkProgress++;
+                }else if(talkProgress==7){
+                    player.tick++;
+                    if(player.tick==5){
+                        player.tick=0;
+                        talkProgress++;
+                    }
+                }else if(talkProgress==8){
+                    stage.removeChild(player2);
+                    array3[14][14]=0;
+                    array3[14][15]=0;
+                    eventMap[14][14]=0;
+                    eventMap[15][14]=0;
+                    scene.removeChild(message);
+                    talkProgress++;
+                }else if(talkProgress==9){
+                    player.tick++;
+                    if(player.tick==15){
+                        buttonSound.play();
+                        message=makeMessage('ミラ「あ、行っちゃった」');
+                        scene.addChild(message);
+                        talkProgress++;
+                        player.tick=0;
+                    }
+                }
+            }else if(eventKind==2 && talkProgress == 0){
+                if(game.input.up && selectState==2){
+                    scene.removeChild(select);
+                    buttonSound.play();
+                    selectState=1;
+                    select=selectWindow(selectState);
+                    scene.addChild(select);
+                }else if(game.input.down && selectState==1){
+                    scene.removeChild(select);
+                    buttonSound.play();
+                    selectState=2;
+                    select=selectWindow(selectState);
+                    scene.addChild(select);
+                }
+            }else if(eventKind==2 && talkProgress == 1){
+                darkwholeSound.play();
+                message=screenDark(0.6);
+                scene.addChild(message);
+                player.tick=0;
+                talkProgress++;
+            }else if(eventKind==2 && talkProgress == 2){
+                player.tick++;
+                if(player.tick==8){
+                    message=screenDark(0.6);
+                    scene.addChild(message);
+                    player.tick=0;
+                    talkProgress++;
+                }
+            }else if(eventKind==2 && talkProgress == 3){
+                player.tick++;
+                if(player.tick==8){
+                    player.tick=0;
+                    talkProgress++;
+                    nowScene=5;
+                    nextScene=51;
+                    previousScene=45;
+                    game.popScene();
+                    if(playerToMapX(player.x)==14){
+                        previousCharaLocate=0;
+                    }else{
+                        previousCharaLocate=1;
+                    }
+                }
+            }
+            
+
+
+        });
+
+        scene.addEventListener(Event.TOUCH_START , function(e) {
+
+            //パッド以外をタッチしたとき
+            if(touchJudge(e.x,e.y)){
+                switch(State){
+                    //イベント中でない時で、イベントが横にある状態で画面タッチすると
+                    case Nomal:
+                        //message=makeMessage(playerToMapX(player.x)+','+playerToMapY(player.y));
+                        //scene.addChild(message);
+                        if(isSurroundEvent(playerToMapX(player.x),playerToMapY(player.y),player.direction,eventMap,3)){
+                            if(itemList[0]==0){
+                                buttonSound.play();
+                                message=makeMessage('くろくろ「おまえのリコーダー、音がずれててきもちわるーい！　ケラケラケラ！！」');
+                                scene.addChild(message);
+                                eventKind=3;
+                                State=GameEvent;
+                            }else{
+                                bgm=false;
+                                buttonSound.play();
+                                message=makeMessage('ミラ「よーし、これでどうだ！」');
+                                scene.addChild(message);
+                                eventKind=5;
+                                State=GameEvent;
+                            }
+                        }else if(player.direction==3 && isSurroundEvent(playerToMapX(player.x),playerToMapY(player.y),player.direction,eventMap,2)){
+                            buttonSound.play();
+                            message=makeMessage('鏡を調べますか？');
+                            scene.addChild(message);
+                            scene.addChild(selectMessage1);
+                            scene.addChild(selectMessage2);
+                            selectState=2;
+                            select=selectWindow(selectState);
+                            scene.addChild(select);
+                            eventKind=2;
+                            State=GameEvent;
+                        }
+                        break;
+                    case GameEvent:    //イベントの種類ごとの処理
+                        switch(eventKind){
+                            case 2:
+                                switch(talkProgress){
+                                    case 0:
+                                        scene.removeChild(message);
+                                        scene.removeChild(select);
+                                        scene.removeChild(selectMessage1);
+                                        scene.removeChild(selectMessage2);
+                                        if(selectState==1){
+                                            bgm=false;
+                                            wholeSound.stop();
+                                            talkProgress++;
+                                        }else{
+                                            talkProgress=0;
+                                            State=Nomal;
+                                            eventKind=0;
+                                        }
+                                        break;
+                                    case 1:
+                                        break;
+                                    case 2:
+                                        break;
+                                    case 3:
+                                        break;
+                                }
+                                break;
+                            case 3:
+                                switch(talkProgress){
+                                    case 0:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage('ミラ「やい、くろくろ！　ちょっとまってろー！」');
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 1:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage('ミラ「もうちょっとまわりをさがせばなにかおちてるかも......」');
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    default:
+                                        scene.removeChild(message);
+                                        talkProgress=0;
+                                        eventKind=0;
+                                        State=Nomal;
+                                        break;
+                                }
+                                break;
+                            case 4:
+                                switch(talkProgress){
+                                    case 0:
+                                        
+                                        break;
+                                    case 1:
+                                            
+                                        break;
+                                    case 2:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage("ミラ「.....でも、前にいるのなんだろう」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 3:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage("ミラ「おーい、まっくろくろすけさーん！」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 4:
+                                        scene.removeChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 5:
+                                        break;
+                                    case 6:
+                                        
+                                        break;
+                                    case 7:
+                                        break;
+                                    case 8:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage("ミラ「そこをどいてくれませんかー？　わたし、その鏡の向こうに行きたいの」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 9:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage("？？？「......へたっぴー！」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 10:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage("ミラ「...え？」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 11:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage("？？？「おまえのリコーダー、音がずれててきもちわるーい！　ケラケラケラケラ！！」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 12:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage("ミラ「な、なんでそのことを！」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 13:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage("ミラ「わたし、へたっぴだけど、へたっぴだけどー........！　うーっ！　あったまきた！」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 14:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage("ミラ「やい、くろくろ！　ちょっとまってろー！」");
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    default:
+                                        scene.removeChild(message);
+                                        talkProgress=0;
+                                        eventKind=0;
+                                        State=Nomal;
+                                        itemList[2]=1;
+                                        bgm=true;
+                                        break;
+                                }
+                                break;
+
+                            case 5:
+                                switch(talkProgress){
+                                    case 0:
+                                        scene.removeChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 1:
+                                        
+                                        break;
+                                    case 2:
+                                        break;
+                                    case 3:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage('くろくろ「.....キキ！　けっこうやるじゃん！」');
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 4:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage('くろくろ「あー、おもしろかったー！」');
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 5:
+                                        
+                                        break;
+                                    case 6:
+                                        
+                                        break;
+                                    case 7:
+                                        
+                                        break;
+                                    case 8:
+                                        
+                                        break;
+                                    case 9:
+                                        break;
+                                    case 10:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage('ミラ「ついムカってなっちゃったけど、なんだったんだろう.....？」');
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    case 11:
+                                        scene.removeChild(message);
+                                        buttonSound.play();
+                                        message=makeMessage('ミラ「まあいっか！　急がないとちこくしちゃう！」');
+                                        scene.addChild(message);
+                                        talkProgress++;
+                                        break;
+                                    default:
+                                        scene.removeChild(message);
+                                        talkProgress=0;
+                                        eventKind=0;
+                                        State=Nomal;
+                                        bgm=true;
+                                        break;
+                                }
+                                break;
+                        }
                 }
             }
         });
