@@ -1,0 +1,35 @@
+変数イベント対応表
+
+eventKind
+0:何もなし
+1:前のシーンへ
+2:次のシーンへ
+3:なふだ取得
+4:人形動く
+5:
+6:
+
+itemList
+0:リコーダー
+1:なふだ
+
+eventMap
+1:前のシーンへ　eventMap[20][6]　eventMap[21][6]
+2:次のシーンへ　eventMap[7][6]　 eventMap[8][6]
+3:なふだ取得    eventMap[25][12]
+4:人形動く      eventMap[19][17] eventMap[20][17]
+
+・シーン遷移注意点
+previousCharaLocate
+nextScene
+previousScene
+nowScene
+
+・選択用
+select
+selectState
+
+・イベント注意点
+eventKind
+talkProgress
+State
